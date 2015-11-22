@@ -1,10 +1,11 @@
 {
     "version": "1.0.0",
     "summary": "A game similar to 1980's Space Panic.",
-    "repository": "https://github.com/pykello/alien-panic",
+    "repository": "https://github.com/pykello/alien-panic.git",
     "license": "BSD2",
     "source-directories": [
-        "."
+        ".",
+        "src"
     ],
     "exposed-modules": [],
     "dependencies": {
