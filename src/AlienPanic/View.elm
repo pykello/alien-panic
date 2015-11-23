@@ -3,7 +3,6 @@ module AlienPanic.View where
 import AlienPanic.Model exposing (..)
 
 import Color exposing (..)
-import String exposing (indexes)
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 
@@ -38,20 +37,4 @@ creature_form screen creature =
 
 get_creatures: GameModel -> List Creature
 get_creatures model =
-  List.concat [
-    [model.player],
-    model.enemies,
-    get_board_tiles '#' model.tiles,
-    get_board_tiles '|' model.tiles]
-
-get_board_tiles: Char -> List String -> List Creature
-get_board_tiles ch board =
-  List.reverse board |>
-  List.indexedMap (\y row -> get_row_tiles ch y row) |>
-  List.concat
-  
-get_row_tiles: Char -> Int -> String -> List Creature
-get_row_tiles ch y row =
-  row |>
-  String.indexes (String.fromChar ch) |>
-  List.map (\x -> {pos = (toFloat x, toFloat y), dir = NONE})
+  List.concat [[model.player], model.enemies, model.bricks, model.ladders]
