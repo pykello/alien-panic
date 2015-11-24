@@ -5,11 +5,16 @@ import AlienPanic.Levels exposing (..)
 
 import Graphics.Element exposing (..)
 import Time exposing (fps)
-import Signal exposing (constant, map, foldp)
+import Signal exposing (constant, map2, foldp, sampleOn)
+import Keyboard exposing (arrows)
 
 main =
   case Model.from_tiles 32 level0 of
     Nothing -> constant (show "Model couldn't be loaded!")
     Just model -> Signal.map view (Signal.foldp update model input)
 
-input = fps 60
+input =
+  let
+    delta = fps 60
+  in
+    Signal.sampleOn delta (Signal.map2 (,) delta Keyboard.arrows)

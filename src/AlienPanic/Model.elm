@@ -49,8 +49,8 @@ screen_from_tiles unit tiles =
     [] -> {unit = 0.0, width = 0.0, height = 0.0}
     x :: xs -> {
                  unit = toFloat unit,
-                 width = toFloat (String.length(x) * unit),
-                 height = toFloat (List.length(tiles) * unit)
+                 width = toFloat (String.length(x)),
+                 height = toFloat (List.length(tiles))
                }
 
 search_grid: Char -> List String -> List Pos
