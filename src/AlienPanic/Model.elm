@@ -1,11 +1,13 @@
 module AlienPanic.Model where
 
 import String exposing (indexes)
+import List exposing (map)
 
 type Dir = LEFT | RIGHT | UP | DOWN | NONE
+type alias Pos = (Float, Float)
 
 type alias Creature = {
-  pos: (Float, Float),
+  pos: Pos,
   dir: Dir,
   name: String
 }
@@ -26,14 +28,17 @@ type alias GameModel = {
 
 from_tiles: Int -> List String -> Maybe GameModel
 from_tiles unit tiles =
-  case get_board_tiles "player" 'P' tiles of
+  case search_grid 'P' tiles of
     [] -> Nothing
     p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
-                 player = p,
-                 enemies = get_board_tiles "enemy" 'E' tiles,
-                 bricks = get_board_tiles "brick" '#' tiles,
-                 ladders = get_board_tiles "ladder" '|' tiles
+                 player = {pos = p, dir=NONE, name="player"},
+                 enemies = search_grid 'E' tiles |> map (\p ->
+                              {pos = p, dir=NONE, name="enemy"}),
+                 bricks = search_grid '#' tiles |> map (\p ->
+                              {pos = p, dir=NONE, name="brick"}),
+                 ladders = search_grid '|' tiles |> map (\p ->
+                              {pos = p, dir=NONE, name="ladder"})
                }
     xs -> Nothing
 
@@ -59,14 +64,14 @@ init = from_tiles 32 [".........",
                       "P.|....E.",
                       "#########"]
 
-get_board_tiles: String -> Char -> List String -> List Creature
-get_board_tiles name ch board =
+search_grid: Char -> List String -> List Pos
+search_grid ch board =
   List.reverse board |>
-  List.indexedMap (\y row -> get_row_tiles name ch y row) |>
+  List.indexedMap (\y row -> search_row ch y row) |>
   List.concat
   
-get_row_tiles: String -> Char -> Int -> String -> List Creature
-get_row_tiles name ch y row =
+search_row: Char -> Int -> String -> List Pos
+search_row ch y row =
   row |>
   String.indexes (String.fromChar ch) |>
-  List.map (\x -> {pos = (toFloat x, toFloat y), dir = NONE, name = name})
+  List.map (\x -> (toFloat x, toFloat y))
