@@ -9,7 +9,8 @@ type alias Pos = (Float, Float)
 type alias GameObject = {
   pos: Pos,
   dir: Dir,
-  name: String
+  name: String,
+  verb: String
 }
 
 type alias Screen = {
@@ -32,13 +33,13 @@ from_tiles unit tiles =
     [] -> Nothing
     p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
-                 player = {pos = p, dir=NONE, name="player"},
+                 player = {pos=p, dir=NONE, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
-                              {pos = p, dir=NONE, name="enemy"}),
+                              {pos=p, dir=NONE, name="enemy", verb=""}),
                  bricks = search_grid '#' tiles |> map (\p ->
-                              {pos = p, dir=NONE, name="brick"}),
+                              {pos=p, dir=NONE, name="brick", verb=""}),
                  ladders = search_grid '|' tiles |> map (\p ->
-                              {pos = p, dir=NONE, name="ladder"})
+                              {pos=p, dir=NONE, name="ladder", verb=""})
                }
     xs -> Nothing
 
