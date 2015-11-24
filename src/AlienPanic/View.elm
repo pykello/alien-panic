@@ -23,7 +23,7 @@ background screen =
   rect screen.width screen.height
     |> filled (rgb 174 238 238)
     
-creature_form: Screen -> Creature -> Form
+creature_form: Screen -> GameObject -> Form
 creature_form screen creature =
   let
     (x, y) = creature.pos
@@ -35,6 +35,6 @@ creature_form screen creature =
       |> toForm 
       |> move (x * unit + dx, y * unit + dy)
 
-get_creatures: GameModel -> List Creature
+get_creatures: GameModel -> List GameObject
 get_creatures model =
   List.concat [[model.player], model.enemies, model.bricks, model.ladders]

@@ -1,4 +1,4 @@
-import AlienPanic.Model exposing (from_tiles)
+import AlienPanic.Model as Model exposing (from_tiles)
 import AlienPanic.View exposing (view)
 import AlienPanic.Levels exposing (..)
 import Graphics.Element exposing (..)

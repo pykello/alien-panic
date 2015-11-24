@@ -6,7 +6,7 @@ import List exposing (map)
 type Dir = LEFT | RIGHT | UP | DOWN | NONE
 type alias Pos = (Float, Float)
 
-type alias Creature = {
+type alias GameObject = {
   pos: Pos,
   dir: Dir,
   name: String
@@ -20,10 +20,10 @@ type alias Screen = {
 
 type alias GameModel = {
   screen: Screen,
-  player: Creature,
-  enemies: List Creature,
-  bricks: List Creature,
-  ladders: List Creature
+  player: GameObject,
+  enemies: List GameObject,
+  bricks: List GameObject,
+  ladders: List GameObject
 }
 
 from_tiles: Int -> List String -> Maybe GameModel
