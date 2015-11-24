@@ -32,8 +32,8 @@ object_form screen obj =
     dx = (screen.width - unit) * -0.5
     dy = (screen.height - unit) * -0.5
     filename = "images/" ++ obj.name ++
-               (if obj.dir == NONE then "" else "_" ++ toString obj.dir) ++
                (if obj.verb == "" then "" else "_" ++ obj.verb) ++
+               (if obj.dir == NONE then "" else "_" ++ toString obj.dir) ++
                ".gif"
   in
     image (floor unit) (floor unit) filename
