@@ -14,17 +14,17 @@ view model =
     collage
      (floor screen.width) (floor screen.height)
      (List.append
-       [background screen]
-       (get_creatures model |> List.map (creature_form screen))
+       [background_form screen]
+       (get_objects model |> List.map (object_form screen))
      )
       
-background: Screen -> Form
-background screen =
+background_form: Screen -> Form
+background_form screen =
   rect screen.width screen.height
     |> filled (rgb 174 238 238)
     
-creature_form: Screen -> GameObject -> Form
-creature_form screen creature =
+object_form: Screen -> GameObject -> Form
+object_form screen creature =
   let
     (x, y) = creature.pos
     unit = screen.unit
@@ -35,6 +35,6 @@ creature_form screen creature =
       |> toForm 
       |> move (x * unit + dx, y * unit + dy)
 
-get_creatures: GameModel -> List GameObject
-get_creatures model =
+get_objects: GameModel -> List GameObject
+get_objects model =
   List.concat [[model.player], model.enemies, model.bricks, model.ladders]
