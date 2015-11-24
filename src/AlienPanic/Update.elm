@@ -19,7 +19,7 @@ update_player (delta, keys) screen player =
     (x, y) = player.pos
     walking = (keys.x == 1 && x < screen.width - 1.0) ||
               (keys.x == -1 && x > 0)
-    dx = if walking then 0.0005 * delta * (toFloat keys.x) else 0
+    dx = if walking then 0.00075 * delta * (toFloat keys.x) else 0
     verb = if walking then "walking" else ""
   in
     {player|
