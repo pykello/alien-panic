@@ -33,7 +33,7 @@ from_tiles unit tiles =
     [] -> Nothing
     p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
-                 player = {pos=p, dir=NONE, name="player", verb=""},
+                 player = {pos=p, dir=RIGHT, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
                               {pos=p, dir=NONE, name="enemy", verb=""}),
                  bricks = search_grid '#' tiles |> map (\p ->
