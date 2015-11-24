@@ -52,18 +52,6 @@ screen_from_tiles unit tiles =
                  height = toFloat (List.length(tiles) * unit)
                }
 
-init: Maybe GameModel
-init = from_tiles 32 [".........",
-                      "......|..",
-                      "E.|...|.E",
-                      "##|###|##",
-                      "..|...|..",
-                      "..|...|..",
-                      "##|######",
-                      "..|......",
-                      "P.|....E.",
-                      "#########"]
-
 search_grid: Char -> List String -> List Pos
 search_grid ch board =
   List.reverse board |>
