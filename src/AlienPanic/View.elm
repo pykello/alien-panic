@@ -10,12 +10,13 @@ view: GameModel -> Element
 view model =
   let
     screen  = model.screen
+    objs = List.concat [[model.player], model.enemies, model.bricks, model.ladders]
   in
     collage
      (floor screen.width) (floor screen.height)
      (List.append
        [background_form screen]
-       (get_objects model |> List.map (object_form screen))
+       (List.map (object_form screen) objs)
      )
       
 background_form: Screen -> Form
@@ -38,7 +39,3 @@ object_form screen obj =
     image (floor unit) (floor unit) filename
       |> toForm 
       |> move (x * unit + dx, y * unit + dy)
-
-get_objects: GameModel -> List GameObject
-get_objects model =
-  List.concat [[model.player], model.enemies, model.bricks, model.ladders]
