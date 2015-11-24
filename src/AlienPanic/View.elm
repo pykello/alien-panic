@@ -31,8 +31,8 @@ creature_form screen creature =
     dx = (screen.width - unit) * -0.5
     dy = (screen.height - unit) * -0.5
   in
-    rect unit unit
-      |> filled (rgb 255 0 0)
+    image (floor unit) (floor unit) ("images/" ++ creature.name ++ ".gif")
+      |> toForm 
       |> move (x * unit + dx, y * unit + dy)
 
 get_creatures: GameModel -> List Creature

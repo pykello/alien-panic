@@ -6,7 +6,8 @@ type Dir = LEFT | RIGHT | UP | DOWN | NONE
 
 type alias Creature = {
   pos: (Float, Float),
-  dir: Dir 
+  dir: Dir,
+  name: String
 }
 
 type alias Screen = {
@@ -25,14 +26,14 @@ type alias GameModel = {
 
 from_tiles: Int -> List String -> Maybe GameModel
 from_tiles unit tiles =
-  case get_board_tiles 'P' tiles of
+  case get_board_tiles "player" 'P' tiles of
     [] -> Nothing
     p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
                  player = p,
-                 enemies = get_board_tiles 'E' tiles,
-                 bricks = get_board_tiles '#' tiles,
-                 ladders = get_board_tiles '|' tiles
+                 enemies = get_board_tiles "enemy" 'E' tiles,
+                 bricks = get_board_tiles "brick" '#' tiles,
+                 ladders = get_board_tiles "ladder" '|' tiles
                }
     xs -> Nothing
 
@@ -47,25 +48,25 @@ screen_from_tiles unit tiles =
                }
 
 init: Maybe GameModel
-init = from_tiles 30 [".........",
-                      ".........",
-                      "E.....|.E",
-                      "######|##",
+init = from_tiles 32 [".........",
                       "......|..",
-                      "......|..",
+                      "E.|...|.E",
+                      "##|###|##",
+                      "..|...|..",
+                      "..|...|..",
                       "##|######",
                       "..|......",
-                      "P.|......",
+                      "P.|....E.",
                       "#########"]
 
-get_board_tiles: Char -> List String -> List Creature
-get_board_tiles ch board =
+get_board_tiles: String -> Char -> List String -> List Creature
+get_board_tiles name ch board =
   List.reverse board |>
-  List.indexedMap (\y row -> get_row_tiles ch y row) |>
+  List.indexedMap (\y row -> get_row_tiles name ch y row) |>
   List.concat
   
-get_row_tiles: Char -> Int -> String -> List Creature
-get_row_tiles ch y row =
+get_row_tiles: String -> Char -> Int -> String -> List Creature
+get_row_tiles name ch y row =
   row |>
   String.indexes (String.fromChar ch) |>
-  List.map (\x -> {pos = (toFloat x, toFloat y), dir = NONE})
+  List.map (\x -> {pos = (toFloat x, toFloat y), dir = NONE, name = name})
