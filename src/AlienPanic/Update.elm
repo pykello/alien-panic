@@ -27,10 +27,3 @@ update_player (delta, keys) screen player =
       dir=dir,
       verb=verb
     }
-
-move: Float -> GameObject -> GameObject
-move dx obj =
-  let
-    (x, y) = obj.pos
-  in
-    {obj|pos=(x+dx, y), dir=RIGHT, verb="walking"}
