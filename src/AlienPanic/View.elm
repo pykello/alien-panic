@@ -12,7 +12,7 @@ view model =
     screen  = model.screen
     w = screen.width * screen.unit
     h = screen.height * screen.unit
-    objs = List.concat [[model.player], model.enemies, model.bricks, model.ladders]
+    objs = List.concat [model.bricks, model.ladders, model.enemies, [model.player]]
   in
     collage (floor w) (floor h)
      (List.append
