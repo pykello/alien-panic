@@ -15,15 +15,15 @@ update_player (delta, keys) model player =
   {player| verb=""}
     |> update_dir keys model
     |> walk delta keys model
-    |> climb delta model
+    |> climb delta keys model
 
 update_dir: Keys -> GameModel -> GameObject -> GameObject
 update_dir keys model obj =
   {obj| dir = case (keys.x, keys.y) of
                 (-1, _) -> if on_platform model obj then LEFT else obj.dir
                 (1, _)  -> if on_platform model obj then RIGHT else obj.dir
-                (_ , 1) -> if on_ladder model obj then UP else obj.dir
-                (_, -1) -> if on_ladder model obj then DOWN else obj.dir
+                (_ , 1) -> if on_ladder model obj.pos then UP else obj.dir
+                (_, -1) -> if on_ladder model obj.pos then DOWN else obj.dir
                 (_, _)  -> obj.dir}
 
 walk: Float -> Keys -> GameModel -> GameObject -> GameObject
@@ -35,26 +35,33 @@ walk delta keys model obj =
                (keys.x == -1 && px > 0))
     dx = if walking then 0.00075 * delta * (toFloat keys.x) else 0
     x = px + dx
-    y = if walking then toFloat (floor py) else py
+    y = if walking then toFloat (floor (py + 0.5001)) else py
     verb = if walking then "walking" else obj.verb
   in
     {obj| pos=(x, y), verb=verb}
 
-climb: Float -> GameModel -> GameObject -> GameObject
-climb delta model obj =
-  obj
+climb: Float -> Keys -> GameModel -> GameObject -> GameObject
+climb delta keys model obj =
+  let
+    (px, py) = obj.pos
+    dy = 0.00075 * delta * (toFloat keys.y)
+    (nx, ny) = (toFloat (floor (px + 0.5001)), py + dy)
+    climbing = (obj.dir == UP || obj.dir == DOWN) &&
+               (on_ladder model (nx, ny))
+    (x, y) = if climbing then (nx, ny) else (px, py)
+    verb = if climbing then "climbing" else obj.verb
+  in
+    {obj| pos=(x, y), verb=verb}
 
 on_platform model obj =
   True
 
-on_ladder model obj =
-  List.member (grid_pos obj)
-              (List.map grid_pos model.ladders)
+on_ladder: GameModel -> (Float, Float) -> Bool
+on_ladder model pos =
+  List.member (grid_pos pos)
+              (List.map (\o -> grid_pos o.pos) model.ladders)
 
 
-grid_pos: GameObject -> (Int, Int)
-grid_pos obj =
-  let
-    (x, y) = obj.pos
-  in
-    (floor (x + 0.5001), floor y)
+grid_pos: (Float, Float) -> (Int, Int)
+grid_pos (x, y) =
+  (floor (x + 0.5001), floor (y + 0.5001))
