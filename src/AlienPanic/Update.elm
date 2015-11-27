@@ -20,8 +20,8 @@ update_player (delta, keys) model player =
 update_dir: Keys -> GameModel -> GameObject -> GameObject
 update_dir keys model obj =
   {obj| dir = case (keys.x, keys.y) of
-                (-1, _) -> if on_platform model obj then LEFT else obj.dir
-                (1, _)  -> if on_platform model obj then RIGHT else obj.dir
+                (-1, _) -> if on_platform model obj.pos then LEFT else obj.dir
+                (1, _)  -> if on_platform model obj.pos then RIGHT else obj.dir
                 (_ , 1) -> if on_ladder model obj.pos then UP else obj.dir
                 (_, -1) -> if on_ladder model obj.pos then DOWN else obj.dir
                 (_, _)  -> obj.dir}
@@ -53,8 +53,15 @@ climb delta keys model obj =
   in
     {obj| pos=(x, y), verb=verb}
 
-on_platform model obj =
-  True
+on_platform: GameModel -> (Float, Float) -> Bool
+on_platform model pos =
+  let
+    platforms = (List.map (\o -> grid_pos o.pos) model.bricks)
+    (x, y) = grid_pos pos
+  in
+    (List.member (x, y - 1) platforms) ||
+    (List.member (x - 1, y - 1) platforms) ||
+    (List.member (x + 1, y - 1) platforms)
 
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
