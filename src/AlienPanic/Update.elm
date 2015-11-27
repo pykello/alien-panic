@@ -13,16 +13,18 @@ update (delta, keys) model =
 update_player: (Float, Keys) -> GameModel -> GameObject -> GameObject
 update_player (delta, keys) model player =
   {player| verb=""}
-    |> update_dir keys 
+    |> update_dir keys model
     |> walk delta keys model
     |> climb delta model
 
-update_dir: Keys -> GameObject -> GameObject
-update_dir keys obj =
-  {obj| dir = case keys.x of
-                -1 -> LEFT
-                1  -> RIGHT
-                _  -> obj.dir}
+update_dir: Keys -> GameModel -> GameObject -> GameObject
+update_dir keys model obj =
+  {obj| dir = case (keys.x, keys.y) of
+                (-1, _) -> if on_platform model obj then LEFT else obj.dir
+                (1, _)  -> if on_platform model obj then RIGHT else obj.dir
+                (_ , 1) -> if on_ladder model obj then UP else obj.dir
+                (_, -1) -> if on_ladder model obj then DOWN else obj.dir
+                (_, _)  -> obj.dir}
 
 walk: Float -> Keys -> GameModel -> GameObject -> GameObject
 walk delta keys model obj =
@@ -41,3 +43,18 @@ walk delta keys model obj =
 climb: Float -> GameModel -> GameObject -> GameObject
 climb delta model obj =
   obj
+
+on_platform model obj =
+  True
+
+on_ladder model obj =
+  List.member (grid_pos obj)
+              (List.map grid_pos model.ladders)
+
+
+grid_pos: GameObject -> (Int, Int)
+grid_pos obj =
+  let
+    (x, y) = obj.pos
+  in
+    (floor (x + 0.5001), floor y)
