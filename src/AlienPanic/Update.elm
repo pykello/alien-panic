@@ -8,22 +8,36 @@ type alias Keys = { x:Int, y:Int }
 update: (Float, Keys) -> GameModel -> GameModel
 update (delta, keys) model =
   {model|
-    player=update_player (delta, keys) model.screen model.player}
+    player=update_player (delta, keys) model model.player}
 
-update_player (delta, keys) screen player =
+update_player: (Float, Keys) -> GameModel -> GameObject -> GameObject
+update_player (delta, keys) model player =
+  {player| verb=""}
+    |> update_dir keys 
+    |> walk delta keys model
+    |> climb delta model
+
+update_dir: Keys -> GameObject -> GameObject
+update_dir keys obj =
+  {obj| dir = case keys.x of
+                -1 -> LEFT
+                1  -> RIGHT
+                _  -> obj.dir}
+
+walk: Float -> Keys -> GameModel -> GameObject -> GameObject
+walk delta keys model obj =
   let
-    dir =
-      if keys.x > 0 then RIGHT
-      else if keys.x < 0 then LEFT
-      else player.dir
-    (x, y) = player.pos
-    walking = (keys.x == 1 && x < screen.width - 1.0) ||
-              (keys.x == -1 && x > 0)
+    (px, py) = obj.pos
+    walking = (obj.dir == LEFT || obj.dir == RIGHT) &&
+              ((keys.x == 1 && px < model.screen.width - 1.0) ||
+               (keys.x == -1 && px > 0))
     dx = if walking then 0.00075 * delta * (toFloat keys.x) else 0
-    verb = if walking then "walking" else ""
+    x = px + dx
+    y = if walking then toFloat (floor py) else py
+    verb = if walking then "walking" else obj.verb
   in
-    {player|
-      pos=(x + dx, y),
-      dir=dir,
-      verb=verb
-    }
+    {obj| pos=(x, y), verb=verb}
+
+climb: Float -> GameModel -> GameObject -> GameObject
+climb delta model obj =
+  obj
