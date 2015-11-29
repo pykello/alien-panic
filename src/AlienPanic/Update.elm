@@ -2,6 +2,7 @@ module AlienPanic.Update where
 
 import AlienPanic.Model exposing (..)
 import Keyboard exposing (..)
+import List exposing (member)
 
 type alias Keys = { x:Int, y:Int }
 
@@ -30,44 +31,51 @@ walk: Float -> Keys -> GameModel -> GameObject -> GameObject
 walk delta keys model obj =
   let
     (px, py) = obj.pos
-    walking = (obj.dir == LEFT || obj.dir == RIGHT) &&
-              ((keys.x == 1 && px < model.screen.width - 1.0) ||
-               (keys.x == -1 && px > 0))
-    dx = if walking then 0.00075 * delta * (toFloat keys.x) else 0
-    x = px + dx
-    y = if walking then toFloat (round py) else py
-    verb = if walking then "walking" else obj.verb
+    (nx, ny) = (
+      px + 0.00075 * delta * (toFloat keys.x),
+      toFloat (round py)
+    )
+    walking = (obj.dir `member` [LEFT, RIGHT]) &&
+              (on_platform model (nx, ny)) &&
+              (keys.x /= 0)
   in
-    {obj| pos=(x, y), verb=verb}
+    if walking then
+      {obj| pos=(nx, ny), verb="walking"}
+    else
+      obj
 
 climb: Float -> Keys -> GameModel -> GameObject -> GameObject
 climb delta keys model obj =
   let
     (px, py) = obj.pos
-    dy = 0.00075 * delta * (toFloat keys.y)
-    (nx, ny) = (toFloat (round px), py + dy)
-    climbing = (obj.dir == UP || obj.dir == DOWN) &&
+    (nx, ny) = (
+      toFloat (round px),
+      py + 0.00075 * delta * (toFloat keys.y)
+    )
+    climbing = (obj.dir `member` [DOWN, UP]) &&
                (on_ladder model (nx, ny)) &&
                (keys.y /= 0)
-    (x, y) = if climbing then (nx, ny) else (px, py)
-    verb = if climbing then "climbing" else obj.verb
   in
-    {obj| pos=(x, y), verb=verb}
+    if climbing then
+      {obj| pos=(nx, ny), verb="climbing"}
+    else
+      obj
 
 on_platform: GameModel -> (Float, Float) -> Bool
 on_platform model pos =
   let
-    platforms = (List.map (\o -> grid_pos o.pos) model.bricks)
+    platforms = List.map (\o -> grid_pos o.pos) model.bricks
+    ladders = List.map (\o -> grid_pos o.pos) model.ladders
     (x, y) = grid_pos pos
   in
-    (List.member (x, y - 1) platforms) ||
-    (List.member (x - 1, y - 1) platforms) ||
-    (List.member (x + 1, y - 1) platforms)
+    (x,y-1) `member` platforms ||
+    (x,y-1) `member` ladders &&
+      ((x-1,y-1) `member` platforms || (x+1,y-1) `member` platforms)
 
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
-  List.member (grid_pos pos)
-              (List.map (\o -> grid_pos o.pos) model.ladders)
+  member (grid_pos pos)
+         (List.map (\o -> grid_pos o.pos) model.ladders)
 
 
 grid_pos: (Float, Float) -> (Int, Int)
