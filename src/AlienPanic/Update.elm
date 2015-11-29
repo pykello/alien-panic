@@ -47,7 +47,7 @@ climb delta keys model obj =
     dy = 0.00075 * delta * (toFloat keys.y)
     (nx, ny) = (toFloat (floor (px + 0.5001)), py + dy)
     climbing = (obj.dir == UP || obj.dir == DOWN) &&
-               (on_ladder model (nx, ny))
+               (keys.y /= 0)
     (x, y) = if climbing then (nx, ny) else (px, py)
     verb = if climbing then "climbing" else obj.verb
   in
