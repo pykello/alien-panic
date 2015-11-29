@@ -2,8 +2,9 @@ module AlienPanic.Update where
 
 import AlienPanic.Model exposing (..)
 import Keyboard exposing (..)
-import List exposing (member)
+import List exposing (member, map)
 
+eps = 1e-6
 type alias Keys = { x:Int, y:Int }
 
 update: (Float, Keys) -> GameModel -> GameModel
@@ -13,45 +14,47 @@ update (delta, keys) model =
 
 update_player: (Float, Keys) -> GameModel -> GameObject -> GameObject
 update_player (delta, keys) model player =
-  {player| verb=""}
-    |> walk delta keys model
-    |> climb delta keys model
+  let
+    dx = 0.00075 * delta * (toFloat keys.x)
+    dy = 0.00075 * delta * (toFloat keys.y)
+  in
+    {player| verb=""}
+      |> walk dx model
+      |> climb dy model
 
-walk: Float -> Keys -> GameModel -> GameObject -> GameObject
-walk delta keys model obj =
+walk: Float -> GameModel -> GameObject -> GameObject
+walk dx model obj =
   let
     (px, py) = obj.pos
-    (nx, ny) = (px + 0.00075 * delta * (toFloat keys.x),
-                toFloat (round py))
+    (nx, ny) = (px + dx, toFloat (round py))
     walking = (on_platform model (nx, ny)) &&
-              (keys.x /= 0)
+              (abs dx > eps)
   in
     if walking then
       {obj| pos=(nx, ny), verb="walking",
-            dir=if keys.x > 0 then RIGHT else LEFT}
+            dir=if dx > 0 then RIGHT else LEFT}
     else
       obj
 
-climb: Float -> Keys -> GameModel -> GameObject -> GameObject
-climb delta keys model obj =
+climb: Float -> GameModel -> GameObject -> GameObject
+climb dy model obj =
   let
     (px, py) = obj.pos
-    (nx, ny) = (toFloat (round px),
-                py + 0.00075 * delta * (toFloat keys.y))
+    (nx, ny) = (toFloat (round px), py + dy)
     climbing = (on_ladder model (nx, ny)) &&
-               (keys.y /= 0)
+               (abs dy > eps)
   in
     if climbing then
       {obj| pos=(nx, ny), verb="climbing",
-            dir=if keys.y > 0 then UP else LEFT}
+            dir=if dy > 0 then UP else DOWN}
     else
       obj
 
 on_platform: GameModel -> (Float, Float) -> Bool
 on_platform model pos =
   let
-    platforms = List.map (\o -> grid_pos o.pos) model.bricks
-    ladders = List.map (\o -> grid_pos o.pos) model.ladders
+    platforms = map (\o -> grid_pos o.pos) model.bricks
+    ladders = map (\o -> grid_pos o.pos) model.ladders
     (x, y) = grid_pos pos
   in
     (x,y-1) `member` platforms ||
@@ -60,8 +63,10 @@ on_platform model pos =
 
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
-  member (grid_pos pos)
-         (List.map (\o -> grid_pos o.pos) model.ladders)
+  let
+    ladders = (map (\o -> grid_pos o.pos) model.ladders)
+  in
+    (grid_pos pos) `member` ladders
 
 grid_pos: (Float, Float) -> (Int, Int)
 grid_pos (x, y) =
