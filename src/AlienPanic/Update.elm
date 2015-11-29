@@ -35,7 +35,7 @@ walk delta keys model obj =
                (keys.x == -1 && px > 0))
     dx = if walking then 0.00075 * delta * (toFloat keys.x) else 0
     x = px + dx
-    y = if walking then toFloat (floor (py + 0.5001)) else py
+    y = if walking then toFloat (round py) else py
     verb = if walking then "walking" else obj.verb
   in
     {obj| pos=(x, y), verb=verb}
@@ -45,8 +45,9 @@ climb delta keys model obj =
   let
     (px, py) = obj.pos
     dy = 0.00075 * delta * (toFloat keys.y)
-    (nx, ny) = (toFloat (floor (px + 0.5001)), py + dy)
+    (nx, ny) = (toFloat (round px), py + dy)
     climbing = (obj.dir == UP || obj.dir == DOWN) &&
+               (on_ladder model (nx, ny)) &&
                (keys.y /= 0)
     (x, y) = if climbing then (nx, ny) else (px, py)
     verb = if climbing then "climbing" else obj.verb
@@ -71,4 +72,4 @@ on_ladder model pos =
 
 grid_pos: (Float, Float) -> (Int, Int)
 grid_pos (x, y) =
-  (floor (x + 0.5001), floor (y + 0.5001))
+  (round x, floor y)
