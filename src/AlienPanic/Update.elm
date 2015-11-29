@@ -5,20 +5,20 @@ import Keyboard exposing (..)
 import List exposing (member, map)
 
 eps = 1e-6
-type alias Keys = { x:Int, y:Int }
+type alias Arrows = { x:Int, y:Int }
 
-update: (Float, Keys) -> GameModel -> GameModel
-update (delta, keys) model =
+update: (Float, Arrows, Bool) -> GameModel -> GameModel
+update (delta, arrows, space) model =
   model
-    |> update_player (delta, keys)
+    |> update_player (delta, arrows)
     |> update_enemies delta
 
-{-| Depending on keys.x/y, player tries to walk or climb. -}
-update_player: (Float, Keys) -> GameModel -> GameModel
-update_player (delta, keys) model =
+{-| Depending on arrows.x/y, player tries to walk or climb. -}
+update_player: (Float, Arrows) -> GameModel -> GameModel
+update_player (delta, arrows) model =
   let
-    dx = 0.00075 * delta * (toFloat keys.x)
-    dy = 0.00075 * delta * (toFloat keys.y)
+    dx = 0.00075 * delta * (toFloat arrows.x)
+    dy = 0.00075 * delta * (toFloat arrows.y)
     player = model.player |> reset |> walk dx model |> climb dy model
   in
     {model| player=player}
