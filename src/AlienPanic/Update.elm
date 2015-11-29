@@ -81,8 +81,8 @@ climb dy model obj =
 on_platform: GameModel -> (Float, Float) -> Bool
 on_platform model pos =
   let
-    platforms = map (\o -> grid_pos o.pos) model.bricks
-    ladders = map (\o -> grid_pos o.pos) model.ladders
+    platforms = map (grid_pos << .pos) model.bricks
+    ladders = map (grid_pos << .pos) model.ladders
     (x, y) = grid_pos pos
   in
     (x,y-1) `member` platforms ||
@@ -92,7 +92,7 @@ on_platform model pos =
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
   let
-    ladders = (map (\o -> grid_pos o.pos) model.ladders)
+    ladders = (map (grid_pos << .pos) model.ladders)
   in
     (grid_pos pos) `member` ladders
 

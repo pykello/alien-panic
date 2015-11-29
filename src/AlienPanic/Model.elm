@@ -56,7 +56,7 @@ screen_from_tiles unit tiles =
 search_grid: Char -> List String -> List Pos
 search_grid ch board =
   List.reverse board |>
-  List.indexedMap (\y row -> search_row ch y row) |>
+  List.indexedMap (search_row ch) |>
   List.concat
   
 search_row: Char -> Int -> String -> List Pos
