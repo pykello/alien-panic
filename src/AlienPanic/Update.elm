@@ -14,33 +14,21 @@ update (delta, keys) model =
 update_player: (Float, Keys) -> GameModel -> GameObject -> GameObject
 update_player (delta, keys) model player =
   {player| verb=""}
-    |> update_dir keys model
     |> walk delta keys model
     |> climb delta keys model
-
-update_dir: Keys -> GameModel -> GameObject -> GameObject
-update_dir keys model obj =
-  {obj| dir = case (keys.x, keys.y) of
-                (-1, _) -> if on_platform model obj.pos then LEFT else obj.dir
-                (1, _)  -> if on_platform model obj.pos then RIGHT else obj.dir
-                (_ , 1) -> if on_ladder model obj.pos then UP else obj.dir
-                (_, -1) -> if on_ladder model obj.pos then DOWN else obj.dir
-                (_, _)  -> obj.dir}
 
 walk: Float -> Keys -> GameModel -> GameObject -> GameObject
 walk delta keys model obj =
   let
     (px, py) = obj.pos
-    (nx, ny) = (
-      px + 0.00075 * delta * (toFloat keys.x),
-      toFloat (round py)
-    )
-    walking = (obj.dir `member` [LEFT, RIGHT]) &&
-              (on_platform model (nx, ny)) &&
+    (nx, ny) = (px + 0.00075 * delta * (toFloat keys.x),
+                toFloat (round py))
+    walking = (on_platform model (nx, ny)) &&
               (keys.x /= 0)
   in
     if walking then
-      {obj| pos=(nx, ny), verb="walking"}
+      {obj| pos=(nx, ny), verb="walking",
+            dir=if keys.x > 0 then RIGHT else LEFT}
     else
       obj
 
@@ -48,16 +36,14 @@ climb: Float -> Keys -> GameModel -> GameObject -> GameObject
 climb delta keys model obj =
   let
     (px, py) = obj.pos
-    (nx, ny) = (
-      toFloat (round px),
-      py + 0.00075 * delta * (toFloat keys.y)
-    )
-    climbing = (obj.dir `member` [DOWN, UP]) &&
-               (on_ladder model (nx, ny)) &&
+    (nx, ny) = (toFloat (round px),
+                py + 0.00075 * delta * (toFloat keys.y))
+    climbing = (on_ladder model (nx, ny)) &&
                (keys.y /= 0)
   in
     if climbing then
-      {obj| pos=(nx, ny), verb="climbing"}
+      {obj| pos=(nx, ny), verb="climbing",
+            dir=if keys.y > 0 then UP else LEFT}
     else
       obj
 
@@ -76,7 +62,6 @@ on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
   member (grid_pos pos)
          (List.map (\o -> grid_pos o.pos) model.ladders)
-
 
 grid_pos: (Float, Float) -> (Int, Int)
 grid_pos (x, y) =
