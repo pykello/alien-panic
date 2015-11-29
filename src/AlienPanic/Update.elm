@@ -9,18 +9,44 @@ type alias Keys = { x:Int, y:Int }
 
 update: (Float, Keys) -> GameModel -> GameModel
 update (delta, keys) model =
-  {model|
-    player=update_player (delta, keys) model model.player}
+  model
+    |> update_player (delta, keys)
+    |> update_enemies delta
 
-update_player: (Float, Keys) -> GameModel -> GameObject -> GameObject
-update_player (delta, keys) model player =
+update_player: (Float, Keys) -> GameModel -> GameModel
+update_player (delta, keys) model =
   let
     dx = 0.00075 * delta * (toFloat keys.x)
     dy = 0.00075 * delta * (toFloat keys.y)
+    player = model.player |> reset |> walk dx model |> climb dy model
   in
-    {player| verb=""}
-      |> walk dx model
-      |> climb dy model
+    {model| player=player}
+
+update_enemies: Float -> GameModel -> GameModel
+update_enemies delta model =
+  let
+    enemies = map (update_enemy delta model) model.enemies
+  in
+    {model| enemies=enemies}
+
+update_enemy: Float -> GameModel -> GameObject -> GameObject
+update_enemy delta model enemy =
+  let
+    (px, py) = enemy.pos
+    dx = 0.00045 * delta * (if enemy.dir == LEFT then -1.0 else 1.0)
+    (nx, ny) = (px + dx, py)
+    can_move = (on_platform model (nx, ny))
+  in
+    if can_move then
+      {enemy| pos=(nx, ny), verb="walking"}
+    else if enemy.dir == LEFT then
+      {enemy| dir=RIGHT, verb=""}
+    else
+      {enemy| dir=LEFT, verb=""}
+
+reset: GameObject -> GameObject
+reset obj =
+  {obj| verb=""}
 
 walk: Float -> GameModel -> GameObject -> GameObject
 walk dx model obj =

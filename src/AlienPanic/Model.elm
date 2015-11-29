@@ -35,7 +35,7 @@ from_tiles unit tiles =
                  screen = screen_from_tiles unit tiles,
                  player = {pos=p, dir=RIGHT, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
-                              {pos=p, dir=NONE, name="enemy", verb=""}),
+                              {pos=p, dir=LEFT, name="enemy", verb=""}),
                  bricks = search_grid '#' tiles |> map (\p ->
                               {pos=p, dir=NONE, name="brick", verb=""}),
                  ladders = search_grid '|' tiles |> map (\p ->
