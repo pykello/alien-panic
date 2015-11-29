@@ -13,6 +13,7 @@ update (delta, keys) model =
     |> update_player (delta, keys)
     |> update_enemies delta
 
+{-| Depending on keys.x/y, player tries to walk or climb. -}
 update_player: (Float, Keys) -> GameModel -> GameModel
 update_player (delta, keys) model =
   let
@@ -29,6 +30,8 @@ update_enemies delta model =
   in
     {model| enemies=enemies}
 
+{-| Enemies walk in the current direction if they can, otherwise
+    they stop. When they stop, they change direction. -}
 update_enemy: Float -> GameModel -> GameObject -> GameObject
 update_enemy delta model enemy =
   let
