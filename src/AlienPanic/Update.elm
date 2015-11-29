@@ -32,17 +32,16 @@ update_enemies delta model =
 update_enemy: Float -> GameModel -> GameObject -> GameObject
 update_enemy delta model enemy =
   let
-    (px, py) = enemy.pos
     dx = 0.00045 * delta * (if enemy.dir == LEFT then -1.0 else 1.0)
-    (nx, ny) = (px + dx, py)
-    can_move = (on_platform model (nx, ny))
   in
-    if can_move then
-      {enemy| pos=(nx, ny), verb="walking"}
-    else if enemy.dir == LEFT then
-      {enemy| dir=RIGHT, verb=""}
-    else
-      {enemy| dir=LEFT, verb=""}
+    enemy |> reset |> walk dx model |> update_enemy_dir
+
+update_enemy_dir: GameObject -> GameObject
+update_enemy_dir enemy =
+  {enemy| dir = case (enemy.verb, enemy.dir) of
+                  ("", LEFT) -> RIGHT
+                  ("", RIGHT) -> LEFT
+                  (_, _) -> enemy.dir}
 
 reset: GameObject -> GameObject
 reset obj =
