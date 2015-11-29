@@ -10,18 +10,29 @@ type alias Arrows = { x:Int, y:Int }
 update: (Float, Arrows, Bool) -> GameModel -> GameModel
 update (delta, arrows, space) model =
   model
-    |> update_player (delta, arrows)
+    |> update_player (delta, arrows, space)
     |> update_enemies delta
 
+update_player: (Float, Arrows, Bool) -> GameModel -> GameModel
+update_player (delta, arrows, space) model =
+  let
+    hit_countdown = if space then 300.0 else model.hit_countdown - delta
+    pplayer = model.player
+    nplayer =
+       if hit_countdown > 0.0 then
+         {pplayer| verb="hitting"}
+       else
+         move_player (delta, arrows) model
+  in
+    {model| player=nplayer, hit_countdown=hit_countdown}
+
 {-| Depending on arrows.x/y, player tries to walk or climb. -}
-update_player: (Float, Arrows) -> GameModel -> GameModel
-update_player (delta, arrows) model =
+move_player (delta, arrows) model =
   let
     dx = 0.00075 * delta * (toFloat arrows.x)
     dy = 0.00075 * delta * (toFloat arrows.y)
-    player = model.player |> reset |> walk dx model |> climb dy model
   in
-    {model| player=player}
+    model.player |> reset |> walk dx model |> climb dy model
 
 update_enemies: Float -> GameModel -> GameModel
 update_enemies delta model =

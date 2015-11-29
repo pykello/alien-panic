@@ -24,7 +24,8 @@ type alias GameModel = {
   player: GameObject,
   enemies: List GameObject,
   bricks: List GameObject,
-  ladders: List GameObject
+  ladders: List GameObject,
+  hit_countdown: Float
 }
 
 from_tiles: Int -> List String -> Maybe GameModel
@@ -39,7 +40,8 @@ from_tiles unit tiles =
                  bricks = search_grid '#' tiles |> map (\p ->
                               {pos=p, dir=NONE, name="brick", verb=""}),
                  ladders = search_grid '|' tiles |> map (\p ->
-                              {pos=p, dir=NONE, name="ladder", verb=""})
+                              {pos=p, dir=NONE, name="ladder", verb=""}),
+                 hit_countdown = 0
                }
     xs -> Nothing
 

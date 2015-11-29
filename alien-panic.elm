@@ -5,7 +5,7 @@ import AlienPanic.Levels exposing (..)
 
 import Graphics.Element exposing (..)
 import Time exposing (fps)
-import Signal exposing (constant, map2, foldp, sampleOn)
+import Signal exposing (constant, map3, foldp, sampleOn)
 import Keyboard exposing (arrows)
 
 main =
@@ -17,4 +17,4 @@ input =
   let
     delta = fps 12
   in
-    Signal.sampleOn delta (Signal.map2 (,) delta Keyboard.arrows)
+    Signal.sampleOn delta (Signal.map3 (,,) delta Keyboard.arrows Keyboard.space)
