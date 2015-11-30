@@ -11,7 +11,7 @@ update: (Float, Arrows, Bool) -> GameModel -> GameModel
 update (delta, arrows, space) model =
   model
     |> update_hits (delta, space)
-    |> update_player (delta, arrows, space)
+    |> update_player (delta, arrows)
     |> update_enemies delta
 
 update_hits (delta, space) model =
@@ -26,8 +26,8 @@ update_hits (delta, space) model =
   in
     {model| hit_countdown=n_hit_countdown}
 
-update_player: (Float, Arrows, Bool) -> GameModel -> GameModel
-update_player (delta, arrows, space) model =
+update_player: (Float, Arrows) -> GameModel -> GameModel
+update_player (delta, arrows) model =
   let
     pplayer = model.player
     nplayer = if model.hit_countdown > 0.0 then
