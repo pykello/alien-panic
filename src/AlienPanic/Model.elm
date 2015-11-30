@@ -37,21 +37,28 @@ type alias GameModel = {
 
 from_tiles: Int -> List String -> Maybe GameModel
 from_tiles unit tiles =
-  case search_grid 'P' tiles of
-    [] -> Nothing
-    p :: [] -> Just {
+  let
+    bricks = search_grid '#' tiles |> map (\p ->
+                {pos=p, dir=NONE, name="brick", verb=""})
+    holes = List.concat (map (\b -> [
+                                      {pos=b.pos, width=0.5, depth=0.0},
+                                      {pos=(fst b.pos + 0.5, snd b.pos), width=0.5, depth=0.0}
+                                    ]) bricks)
+  in
+    case search_grid 'P' tiles of
+      [] -> Nothing
+      p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
                  player = {pos=p, dir=RIGHT, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
                               {pos=p, dir=LEFT, name="enemy", verb=""}),
-                 bricks = search_grid '#' tiles |> map (\p ->
-                              {pos=p, dir=NONE, name="brick", verb=""}),
+                 bricks = bricks,
                  ladders = search_grid '|' tiles |> map (\p ->
                               {pos=p, dir=NONE, name="ladder", verb=""}),
-                 holes = [{pos=(0, 0), width=0.5, depth=0.25}],
+                 holes = holes,
                  hit_countdown = 0
                }
-    xs -> Nothing
+      xs -> Nothing
 
 screen_from_tiles: Int -> List String -> Screen
 screen_from_tiles unit tiles =

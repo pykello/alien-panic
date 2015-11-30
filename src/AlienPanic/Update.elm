@@ -23,8 +23,32 @@ update_hits (delta, space) model =
                         300.0
                       else
                         0.0
+    holes = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
+              dig_hole model.holes (hole_coord model.player)
+            else
+              model.holes
   in
-    {model| hit_countdown=n_hit_countdown}
+    {model| hit_countdown=n_hit_countdown, holes=holes}
+
+hole_coord player =
+  let
+    (player_x, player_y) = player.pos
+    dx = if player.dir == RIGHT then 1.0 else -1.0
+    hole_x = toFloat (floor ((player_x + dx) * 2.0)) * 0.5
+    hole_y = player_y - 1.0
+  in
+    (hole_x, hole_y)
+
+dig_hole holes pos =
+  holes |>
+    map (\hole -> if (pos_eq hole.pos pos) then
+                   {hole|depth=max (hole.depth+0.2) 1.0}
+                 else
+                   hole)
+
+pos_eq (x1, y1) (x2, y2) =
+  abs (x1 - x2) < eps &&
+  abs (y1 - y2) < eps
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =
