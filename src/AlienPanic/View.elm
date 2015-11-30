@@ -5,6 +5,7 @@ import AlienPanic.Model exposing (..)
 import Color exposing (..)
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
+import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
 
@@ -14,13 +15,13 @@ view model =
     screen  = model.screen
     w = screen.width * screen.unit
     h = screen.height * screen.unit
-    objs = List.concat [model.bricks, model.ladders, model.enemies, [model.player]]
+    objs = concat [model.bricks, model.ladders, model.enemies, [model.player]]
   in
     collage (floor w) (floor h)
-     (List.concat [
+     (concat [
         [rect w h |> filled bgcolor],
-        List.map (object_form screen) objs,
-        List.map (hole_form screen) model.holes
+        map (object_form screen) objs,
+        map (hole_form screen) model.holes
       ])
 
 object_form: Screen -> GameObject -> Form
