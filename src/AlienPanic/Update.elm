@@ -33,7 +33,7 @@ update_hits (delta, space) model =
 hole_coord player =
   let
     (player_x, player_y) = player.pos
-    dx = if player.dir == RIGHT then 1.0 else -1.0
+    dx = if player.dir == RIGHT then 1.0 else -0.0
     hole_x = toFloat (floor ((player_x + dx) * 2.0)) * 0.5
     hole_y = player_y - 1.0
   in
