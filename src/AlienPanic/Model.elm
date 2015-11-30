@@ -13,6 +13,12 @@ type alias GameObject = {
   verb: String
 }
 
+type alias Hole = {
+  pos: Pos,
+  width: Float,
+  depth: Float
+}
+
 type alias Screen = {
   unit: Float,
   width: Float,
@@ -25,6 +31,7 @@ type alias GameModel = {
   enemies: List GameObject,
   bricks: List GameObject,
   ladders: List GameObject,
+  holes: List Hole,
   hit_countdown: Float
 }
 
@@ -41,6 +48,7 @@ from_tiles unit tiles =
                               {pos=p, dir=NONE, name="brick", verb=""}),
                  ladders = search_grid '|' tiles |> map (\p ->
                               {pos=p, dir=NONE, name="ladder", verb=""}),
+                 holes = [{pos=(0, 0), width=0.5, depth=0.25}],
                  hit_countdown = 0
                }
     xs -> Nothing
