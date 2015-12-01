@@ -130,13 +130,10 @@ climb dy model obj =
 on_platform: GameModel -> (Float, Float) -> Bool
 on_platform model pos =
   let
-    platforms = map (grid_pos << .pos) model.bricks
-    ladders = map (grid_pos << .pos) model.ladders
-    (x, y) = grid_pos pos
+    r = Rect.from_pos pos 1.0 1.0
+    platforms_beneath = filter (Rect.is_under r << .rect) model.bricks
   in
-    (x,y-1) `member` platforms ||
-    (x,y-1) `member` ladders &&
-      ((x-1,y-1) `member` platforms || (x+1,y-1) `member` platforms)
+    not (List.isEmpty platforms_beneath)
 
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
@@ -145,10 +142,6 @@ on_ladder model pos =
     overlapping_ladders = filter (Rect.contains_center r << .rect) model.ladders 
   in
     not (List.isEmpty overlapping_ladders)
-
-grid_pos: (Float, Float) -> (Int, Int)
-grid_pos (x, y) =
-  (round x, floor y)
 
 hole_depth: GameModel -> Pos -> Float
 hole_depth model pos =

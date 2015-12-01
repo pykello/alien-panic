@@ -7,10 +7,10 @@ from_pos: (Float, Float) -> Float -> Float -> Rect
 from_pos (x, y) w h =
   (x, y, w, h)
 
-on_top: Rect -> Rect -> Bool
-on_top rect1 rect2 =
-  range_overlaps (x_range rect1) (x_range rect2) &&
-  range_overlaps (y_range rect1) (bottom rect2, bottom rect2)
+is_under: Rect -> Rect -> Bool
+is_under rect1 rect2 =
+  range_overlaps (x_range rect2) (x_range rect1) &&
+  range_overlaps (y_range rect2) (bottom rect1, bottom rect1)
 
 overlaps rect1 rect2 =
   range_overlaps (x_range rect1) (x_range rect2) &&
