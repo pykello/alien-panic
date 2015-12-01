@@ -42,7 +42,7 @@ hole_coord player =
 dig_hole holes pos =
   holes |>
     map (\hole -> if (pos_eq hole.pos pos) then
-                   {hole|depth=min (hole.depth+0.2) 1.0}
+                   {hole|depth=min (hole.depth+0.2) 0.8}
                  else
                    hole)
 
