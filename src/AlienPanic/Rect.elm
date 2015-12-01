@@ -10,7 +10,7 @@ from_pos (x, y) w h =
 is_under: Rect -> Rect -> Bool
 is_under rect1 rect2 =
   range_overlaps (x_range rect2) (x_range rect1) &&
-  range_overlaps (y_range rect2) (bottom rect1, bottom rect1)
+  range_overlaps (y_range_top rect2) (bottom rect1, bottom rect1)
 
 overlaps rect1 rect2 =
   range_overlaps (x_range rect1) (x_range rect2) &&
@@ -26,6 +26,9 @@ x_range (x, _, w, _) =
 
 y_range (_, y, _, h) =
   (y - h * 0.5, y + h * 0.5)
+
+y_range_top (_, y, _, h) =
+  (y, y + h * 0.5)
 
 bottom rect =
   fst (y_range rect)
