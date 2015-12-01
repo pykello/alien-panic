@@ -1,5 +1,6 @@
 module AlienPanic.Update where
 
+import AlienPanic.Rect as Rect exposing (..)
 import AlienPanic.Model exposing (..)
 import Keyboard exposing (..)
 import List exposing (..)
@@ -107,8 +108,8 @@ walk dx model obj =
               (abs dx > eps)
   in
     if walking then
-      {obj| pos=(nx, ny-depth), verb="walking",
-            dir=if dx > 0 then RIGHT else LEFT}
+      {obj| pos=(nx, ny-depth), rect=(nx, ny-depth, 1.0, 1.0),
+            verb="walking", dir=if dx > 0 then RIGHT else LEFT}
     else
       obj
 
@@ -121,8 +122,8 @@ climb dy model obj =
                (abs dy > eps)
   in
     if climbing then
-      {obj| pos=(nx, ny), verb="climbing",
-            dir=if dy > 0 then UP else DOWN}
+      {obj| pos=(nx, ny), rect=(nx, ny, 1.0, 1.0),
+            verb="climbing", dir=if dy > 0 then UP else DOWN}
     else
       obj
 
@@ -140,9 +141,10 @@ on_platform model pos =
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
   let
-    ladders = (map (grid_pos << .pos) model.ladders)
+    r = Rect.from_pos pos 1.0 1.0
+    overlapping_ladders = filter (Rect.contains_center r << .rect) model.ladders 
   in
-    (grid_pos pos) `member` ladders
+    not (List.isEmpty overlapping_ladders)
 
 grid_pos: (Float, Float) -> (Int, Int)
 grid_pos (x, y) =
