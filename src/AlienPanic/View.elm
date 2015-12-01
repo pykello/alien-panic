@@ -15,13 +15,13 @@ view model =
     screen  = model.screen
     w = screen.width * screen.unit
     h = screen.height * screen.unit
-    objs = concat [model.bricks, model.ladders, model.enemies, [model.player]]
   in
     collage (floor w) (floor h)
      (concat [
         [rect w h |> filled bgcolor],
-        map (object_form screen) objs,
-        map (hole_form screen) model.holes
+        map (object_form screen) (model.bricks ++ model.ladders),
+        map (hole_form screen) model.holes,
+        map (object_form screen) (model.player :: model.enemies)
       ])
 
 object_form: Screen -> GameObject -> Form

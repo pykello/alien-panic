@@ -2,7 +2,7 @@ module AlienPanic.Update where
 
 import AlienPanic.Model exposing (..)
 import Keyboard exposing (..)
-import List exposing (member, map)
+import List exposing (..)
 
 eps = 1e-6
 type alias Arrows = { x:Int, y:Int }
@@ -102,11 +102,12 @@ walk dx model obj =
   let
     (px, py) = obj.pos
     (nx, ny) = (px + dx, toFloat (round py))
+    depth = hole_depth model (nx, ny)
     walking = (on_platform model (nx, ny)) &&
               (abs dx > eps)
   in
     if walking then
-      {obj| pos=(nx, ny), verb="walking",
+      {obj| pos=(nx, ny-depth), verb="walking",
             dir=if dx > 0 then RIGHT else LEFT}
     else
       obj
@@ -146,3 +147,23 @@ on_ladder model pos =
 grid_pos: (Float, Float) -> (Int, Int)
 grid_pos (x, y) =
   (round x, floor y)
+
+hole_depth: GameModel -> Pos -> Float
+hole_depth model pos =
+  let
+    hole_below = head (filter (on_hole pos) model.holes)
+  in
+    case hole_below of
+      Just hole -> hole.depth
+      Nothing -> 0.0
+
+on_hole: Pos -> Hole -> Bool
+on_hole (x, y) hole =
+  let
+    (hole_x, hole_y) = hole.pos
+    center_x = x + 0.5
+  in
+    center_x > hole_x &&
+    center_x < hole_x + hole.width &&
+    y > hole_y &&
+    y < hole_y + 1.5
