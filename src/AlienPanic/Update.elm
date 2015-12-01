@@ -146,19 +146,9 @@ on_ladder model pos =
 hole_depth: GameModel -> Pos -> Float
 hole_depth model pos =
   let
-    hole_below = head (filter (on_hole pos) model.holes)
+    r = Rect.from_pos pos 1.0 1.0
+    hole_below = head (filter (Rect.is_under r << .rect) model.holes)
   in
     case hole_below of
       Just hole -> hole.depth
       Nothing -> 0.0
-
-on_hole: Pos -> Hole -> Bool
-on_hole (x, y) hole =
-  let
-    (hole_x, hole_y) = hole.pos
-    center_x = x + 0.5
-  in
-    center_x > hole_x &&
-    center_x < hole_x + hole.width &&
-    y > hole_y &&
-    y < hole_y + 1.5

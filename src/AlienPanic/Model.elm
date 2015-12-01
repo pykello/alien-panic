@@ -17,7 +17,7 @@ type alias GameObject = {
 
 type alias Hole = {
   pos: Pos,
-  width: Float,
+  rect: Rect,
   depth: Float
 }
 
@@ -42,10 +42,7 @@ from_tiles unit tiles =
   let
     bricks = search_grid '#' tiles |> map (\p ->
                 {pos=p, rect=from_pos p 1.0 1.0, dir=NONE, name="brick", verb=""})
-    holes = List.concat (map (\b -> [
-                                      {pos=b.pos, width=0.5, depth=0.0},
-                                      {pos=(fst b.pos + 0.5, snd b.pos), width=0.5, depth=0.0}
-                                    ]) bricks)
+    holes = List.concat (map (platform_holes << .rect) bricks)
   in
     case search_grid 'P' tiles of
       [] -> Nothing
@@ -64,6 +61,13 @@ from_tiles unit tiles =
                  hit_countdown = 0
                }
       xs -> Nothing
+
+platform_holes: Rect -> List Hole
+platform_holes (x, y, w, h) =
+  [
+    {pos=(x-w/2.0, y), rect=(x-w/4.0, y, w/2.0, h), depth=0.0},
+    {pos=(x, y), rect=(x+w/4.0, y, w/2.0, h), depth=0.0}
+  ]
 
 screen_from_tiles: Int -> List String -> Screen
 screen_from_tiles unit tiles =

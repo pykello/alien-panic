@@ -40,7 +40,7 @@ object_form screen obj =
 hole_form: Screen -> Hole -> Form
 hole_form screen hole =
   let
-    width = hole.width
+    (_, _, width, _) = hole.rect
     depth = hole.depth
     unit = screen.unit
     (x, y) = hole.pos
