@@ -102,8 +102,8 @@ walk dx model obj =
               (abs dx > eps)
   in
     if walking then
-      {obj| pos=(nx, ny-depth), rect=(nx, ny-depth, w, h),
-            verb="walking", dir=if dx > 0 then RIGHT else LEFT}
+      {obj| rect=(nx, ny-depth, w, h), verb="walking",
+            dir=if dx > 0 then RIGHT else LEFT}
     else
       obj
 
@@ -116,8 +116,8 @@ climb dy model obj =
                (abs dy > eps)
   in
     if climbing then
-      {obj| pos=(nx, ny), rect=(nx, ny, w, h),
-            verb="climbing", dir=if dy > 0 then UP else DOWN}
+      {obj| rect=(nx, ny, w, h), verb="climbing",
+            dir=if dy > 0 then UP else DOWN}
     else
       obj
 

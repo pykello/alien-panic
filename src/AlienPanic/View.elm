@@ -9,6 +9,7 @@ import Graphics.Element exposing (..)
 import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
+debug = True
 
 view: GameModel -> Element
 view model =
@@ -22,7 +23,7 @@ view model =
         [rect w h |> filled bgcolor],
         map (object_form screen) (model.bricks ++ model.ladders),
         map (hole_form screen) model.holes,
-        [rect_form screen (rgb 0 0 255) model.player.rect],
+        if debug then [rect_form screen (rgb 0 0 255) model.player.rect] else [],
         map (object_form screen) (model.player :: model.enemies)
       ])
 
@@ -43,7 +44,9 @@ hole_form: Screen -> Rect -> Form
 hole_form screen rect =
   let
     (x, _, _, _) = rect
-    color = if (x - toFloat (floor x)) > 0.5 then
+    color = if not debug then
+              bgcolor
+            else if (x - toFloat (floor x)) > 0.5 then
               (rgb 255 0 0)
             else
               (rgb 0 255 0)

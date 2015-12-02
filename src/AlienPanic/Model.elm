@@ -8,7 +8,6 @@ type Dir = LEFT | RIGHT | UP | DOWN | NONE
 type alias Pos = (Float, Float)
 
 type alias GameObject = {
-  pos: Pos,
   rect: Rect,
   dir: Dir,
   name: String,
@@ -35,21 +34,21 @@ from_tiles: Int -> List String -> Maybe GameModel
 from_tiles unit tiles =
   let
     bricks = search_grid '#' tiles |> map (\p ->
-                {pos=p, rect=from_pos p 1.0 1.0, dir=NONE, name="brick", verb=""})
+                {rect=from_pos p 1.0 1.0, dir=NONE, name="brick", verb=""})
     holes = List.concat (map (platform_holes << .rect) bricks)
   in
     case search_grid 'P' tiles of
       [] -> Nothing
       p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
-                 player = {pos=p, rect=from_pos p 1.0 1.0,
+                 player = {rect=from_pos p 1.0 1.0,
                            dir=RIGHT, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
-                              {pos=p, rect=from_pos p 1.0 1.0,
+                              {rect=from_pos p 1.0 1.0,
                                dir=LEFT, name="enemy", verb=""}),
                  bricks = bricks,
                  ladders = search_grid '|' tiles |> map (\p ->
-                              {pos=p, rect=from_pos p 1.0 1.0,
+                              {rect=from_pos p 1.0 1.0,
                                dir=NONE, name="ladder", verb=""}),
                  holes = holes,
                  hit_countdown = 0
