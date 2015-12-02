@@ -57,7 +57,7 @@ from_tiles unit tiles =
 platform_holes: Rect -> List Rect
 platform_holes (x, y, w, h) =
   [
-    (x - w/4.0, y + h - 0.2, w * 0.5, h),
+    (x - w/4.0, y + h, w * 0.5, h),
     (x + w/4.0, y + h, w * 0.5, h)
   ]
 
