@@ -48,6 +48,9 @@ y_range (_, y, _, h) =
 y_range_top (_, y, _, h) =
   (y, y + h * 0.5)
 
+top_half (x, y, w, h) =
+  (x, y+h*0.25, w, h*0.5)
+
 bottom rect =
   fst (y_range rect)
 

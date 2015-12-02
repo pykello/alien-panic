@@ -135,12 +135,13 @@ climb dy model obj =
       obj
 
 on_platform: GameModel -> Rect -> Bool
-on_platform model rect =
-  let
-    c = (center_x rect, bottom_y rect)
-    platforms_beneath = filter (Rect.contains c << .rect) model.bricks
-  in
-    not (List.isEmpty platforms_beneath)
+on_platform model (x, y, w, h) =
+  if on_ladder model (x, y, w, h) then
+    on_platform model (x-1.1, y, w, h) || on_platform model (x+1.1, y, w, h)
+  else
+    case find_hole model (x, y, w, h) of
+      Just _ -> True
+      Nothing -> False
 
 on_ladder: GameModel -> Rect -> Bool
 on_ladder model rect =
@@ -160,7 +161,6 @@ find_hole model rect =
       [] -> Nothing
       rect :: [] -> Just rect
       _ -> Nothing
-
 
 hole_depth: Rect -> Float
 hole_depth (x, y, w, h) =
