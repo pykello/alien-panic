@@ -35,15 +35,21 @@ dig_hole holes player =
   let
     r = player.rect
     test_point = if player.dir == LEFT then
-                   (left_x r, bottom_y r)
+                   (left_x r - 2 * eps, bottom_y r)
                  else
-                   (right_x r, bottom_y r)
+                   (right_x r + 2 * eps, bottom_y r)
   in
     holes |>
       map (\hole -> if contains test_point hole then
-                     hole
+                     deepen_hole hole
                     else
                      hole)
+
+deepen_hole (x, y, w, h) =
+  if hole_depth (x, y, w, h) < 0.5 - eps then
+    (x, y - 0.2, w, h)
+  else
+    (x, y, w, h)
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =
@@ -96,13 +102,20 @@ walk: Float -> GameModel -> GameObject -> GameObject
 walk dx model obj =
   let
     (px, py, w, h) = obj.rect
-    (nx, ny) = (px + dx, toFloat (round py))
-    depth = hole_depth model (nx, ny, w, h)
+    (nx, ny) =
+      case find_hole model (px + dx, py, w, h) of
+        Just hole ->
+          if hole_depth hole > 0.5 then
+            center hole
+          else
+            (px + dx, center_y hole)
+        Nothing ->
+          (px + dx, toFloat (round py))
     walking = (on_platform model (nx, ny, w, h)) &&
               (abs dx > eps)
   in
     if walking then
-      {obj| rect=(nx, ny-depth, w, h), verb="walking",
+      {obj| rect=(nx, ny, w, h), verb="walking",
             dir=if dx > 0 then RIGHT else LEFT}
     else
       obj
@@ -124,7 +137,8 @@ climb dy model obj =
 on_platform: GameModel -> Rect -> Bool
 on_platform model rect =
   let
-    platforms_beneath = filter (Rect.is_under rect << .rect) model.bricks
+    c = (center_x rect, bottom_y rect)
+    platforms_beneath = filter (Rect.contains c << .rect) model.bricks
   in
     not (List.isEmpty platforms_beneath)
 
@@ -136,13 +150,18 @@ on_ladder model rect =
   in
     not (List.isEmpty overlapping_ladders)
 
-hole_depth: GameModel -> Rect -> Float
-hole_depth model rect =
+find_hole: GameModel -> Rect -> Maybe Rect
+find_hole model rect =
   let
-    p = center rect
+    p = (center_x rect, bottom_y rect)
     holes_below = filter (Rect.contains p) model.holes
   in
     case holes_below of
-      [] -> 0.0
-      (x, y, w, h) :: [] -> toFloat (ceiling y) - y
-      _ -> 0.6
+      [] -> Nothing
+      rect :: [] -> Just rect
+      _ -> Nothing
+
+
+hole_depth: Rect -> Float
+hole_depth (x, y, w, h) =
+  toFloat (ceiling y) - y
