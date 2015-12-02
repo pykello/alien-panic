@@ -5,7 +5,6 @@ import String exposing (indexes)
 import List exposing (map)
 
 type Dir = LEFT | RIGHT | UP | DOWN | NONE
-type alias Pos = (Float, Float)
 
 type alias GameObject = {
   rect: Rect,
@@ -72,13 +71,13 @@ screen_from_tiles unit tiles =
                  height = toFloat (List.length(tiles))
                }
 
-search_grid: Char -> List String -> List Pos
+search_grid: Char -> List String -> List (Float, Float)
 search_grid ch board =
   List.reverse board |>
   List.indexedMap (search_row ch) |>
   List.concat
   
-search_row: Char -> Int -> String -> List Pos
+search_row: Char -> Int -> String -> List (Float, Float)
 search_row ch y row =
   row |>
   String.indexes (String.fromChar ch) |>
