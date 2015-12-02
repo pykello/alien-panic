@@ -1,6 +1,7 @@
 module AlienPanic.View where
 
 import AlienPanic.Model exposing (..)
+import AlienPanic.Rect exposing (..)
 
 import Color exposing (..)
 import Graphics.Collage exposing (..)
@@ -21,6 +22,7 @@ view model =
         [rect w h |> filled bgcolor],
         map (object_form screen) (model.bricks ++ model.ladders),
         map (hole_form screen) model.holes,
+        [rect_form screen (rgb 0 0 255) model.player.rect],
         map (object_form screen) (model.player :: model.enemies)
       ])
 
@@ -35,22 +37,27 @@ object_form screen obj =
   in
     image (floor unit) (floor unit) filename
       |> toForm 
-      |> move (physical_coord screen (1.0, 1.0) obj.pos)
+      |> move (physical_coord screen obj.rect)
 
-hole_form: Screen -> Hole -> Form
-hole_form screen hole =
+hole_form: Screen -> Rect -> Form
+hole_form screen rect =
   let
-    (_, _, width, _) = hole.rect
-    depth = hole.depth
-    unit = screen.unit
-    (x, y) = hole.pos
+    (x, _, _, _) = rect
+    color = if (x - toFloat (floor x)) > 0.5 then
+              (rgb 255 0 0)
+            else
+              (rgb 0 255 0)
   in
-    rect (width * unit) (depth * unit) |>
-    filled bgcolor |>
-    move (physical_coord screen (width, depth) (x, y + 1.0 - depth))
+    rect_form screen color rect
 
-physical_coord: Screen -> (Float, Float) -> (Float, Float) -> (Float, Float)
-physical_coord screen (w, h) (x, y) =
+rect_form: Screen -> Color -> Rect -> Form
+rect_form screen color (x, y, w, h) =
+  rect (w * screen.unit) (h * screen.unit) |>
+  filled color |>
+  move (physical_coord screen (x, y, w, h))
+
+physical_coord: Screen -> Rect -> (Float, Float)
+physical_coord screen (x, y, w, h) =
   let
     unit = screen.unit
     dx = unit * (screen.width - w) * -0.5

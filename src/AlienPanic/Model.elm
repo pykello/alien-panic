@@ -15,12 +15,6 @@ type alias GameObject = {
   verb: String
 }
 
-type alias Hole = {
-  pos: Pos,
-  rect: Rect,
-  depth: Float
-}
-
 type alias Screen = {
   unit: Float,
   width: Float,
@@ -33,7 +27,7 @@ type alias GameModel = {
   enemies: List GameObject,
   bricks: List GameObject,
   ladders: List GameObject,
-  holes: List Hole,
+  holes: List Rect,
   hit_countdown: Float
 }
 
@@ -62,11 +56,11 @@ from_tiles unit tiles =
                }
       xs -> Nothing
 
-platform_holes: Rect -> List Hole
+platform_holes: Rect -> List Rect
 platform_holes (x, y, w, h) =
   [
-    {pos=(x-w/2.0, y), rect=(x-w/4.0, y, w/2.0, h), depth=0.0},
-    {pos=(x, y), rect=(x+w/4.0, y, w/2.0, h), depth=0.0}
+    (x - w/4.0, y + h - 0.2, w * 0.5, h),
+    (x + w/4.0, y + h, w * 0.5, h)
   ]
 
 screen_from_tiles: Int -> List String -> Screen

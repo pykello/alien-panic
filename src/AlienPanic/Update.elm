@@ -40,9 +40,9 @@ dig_hole holes player =
                    (right_x r, bottom_y r)
   in
     holes |>
-      map (\hole -> if contains test_point hole.rect then
-                     {hole|depth=min (hole.depth+0.2) 0.6}
-                   else
+      map (\hole -> if contains test_point hole then
+                     hole
+                    else
                      hole)
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
@@ -95,14 +95,14 @@ reset obj =
 walk: Float -> GameModel -> GameObject -> GameObject
 walk dx model obj =
   let
-    (px, py) = obj.pos
+    (px, py, w, h) = obj.rect
     (nx, ny) = (px + dx, toFloat (round py))
-    depth = hole_depth model (nx, ny)
-    walking = (on_platform model (nx, ny)) &&
+    depth = hole_depth model (nx, ny, w, h)
+    walking = (on_platform model (nx, ny, w, h)) &&
               (abs dx > eps)
   in
     if walking then
-      {obj| pos=(nx, ny-depth), rect=(nx, ny-depth, 1.0, 1.0),
+      {obj| pos=(nx, ny-depth), rect=(nx, ny-depth, w, h),
             verb="walking", dir=if dx > 0 then RIGHT else LEFT}
     else
       obj
@@ -110,39 +110,38 @@ walk dx model obj =
 climb: Float -> GameModel -> GameObject -> GameObject
 climb dy model obj =
   let
-    (px, py) = obj.pos
+    (px, py, w, h) = obj.rect
     (nx, ny) = (toFloat (round px), py + dy)
-    climbing = (on_ladder model (nx, ny)) &&
+    climbing = (on_ladder model (nx, ny, w, h)) &&
                (abs dy > eps)
   in
     if climbing then
-      {obj| pos=(nx, ny), rect=(nx, ny, 1.0, 1.0),
+      {obj| pos=(nx, ny), rect=(nx, ny, w, h),
             verb="climbing", dir=if dy > 0 then UP else DOWN}
     else
       obj
 
-on_platform: GameModel -> (Float, Float) -> Bool
-on_platform model pos =
+on_platform: GameModel -> Rect -> Bool
+on_platform model rect =
   let
-    r = Rect.from_pos pos 1.0 1.0
-    platforms_beneath = filter (Rect.is_under r << .rect) model.bricks
+    platforms_beneath = filter (Rect.is_under rect << .rect) model.bricks
   in
     not (List.isEmpty platforms_beneath)
 
-on_ladder: GameModel -> (Float, Float) -> Bool
-on_ladder model pos =
+on_ladder: GameModel -> Rect -> Bool
+on_ladder model rect =
   let
-    overlapping_ladders = filter (Rect.contains pos << .rect) model.ladders 
+    c = center rect
+    overlapping_ladders = filter (Rect.contains c << .rect) model.ladders 
   in
     not (List.isEmpty overlapping_ladders)
 
-hole_depth: GameModel -> Pos -> Float
-hole_depth model pos =
+hole_depth: GameModel -> Rect -> Float
+hole_depth model rect =
   let
-    r = Rect.from_pos pos 1.0 1.0
-    p = (center_x r, bottom_y r)
-    hole_below = head (filter (Rect.contains p << .rect) model.holes)
+    p = (center_x rect, bottom_y rect)
+    hole_below = head (filter (Rect.contains p) model.holes)
   in
     case hole_below of
-      Just hole -> hole.depth
+      Just (x, y, w, h) -> toFloat (ceiling y) - y
       Nothing -> 0.0
