@@ -138,8 +138,7 @@ on_platform model pos =
 on_ladder: GameModel -> (Float, Float) -> Bool
 on_ladder model pos =
   let
-    r = Rect.from_pos pos 1.0 1.0
-    overlapping_ladders = filter (Rect.contains_center r << .rect) model.ladders 
+    overlapping_ladders = filter (Rect.contains pos << .rect) model.ladders 
   in
     not (List.isEmpty overlapping_ladders)
 
@@ -147,7 +146,8 @@ hole_depth: GameModel -> Pos -> Float
 hole_depth model pos =
   let
     r = Rect.from_pos pos 1.0 1.0
-    hole_below = head (filter (Rect.is_under r << .rect) model.holes)
+    p = (center_x r, bottom_y r)
+    hole_below = head (filter (Rect.contains p << .rect) model.holes)
   in
     case hole_below of
       Just hole -> hole.depth

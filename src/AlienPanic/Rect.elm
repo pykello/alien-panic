@@ -7,6 +7,15 @@ from_pos: (Float, Float) -> Float -> Float -> Rect
 from_pos (x, y) w h =
   (x, y, w, h)
 
+center_x (x, _, _, _) =
+  x
+
+center_y (_, y, _, _) =
+  y
+
+bottom_y (_, y, _, h) =
+  y - h * 0.5
+
 is_under: Rect -> Rect -> Bool
 is_under rect1 rect2 =
   range_overlaps (x_range rect2) (x_range rect1) &&
@@ -16,8 +25,8 @@ overlaps rect1 rect2 =
   range_overlaps (x_range rect1) (x_range rect2) &&
   range_overlaps (y_range rect1) (y_range rect2)
 
-contains_center: Rect -> Rect -> Bool
-contains_center (x1, y1, _, _) rect2 =
+contains: (Float, Float) -> Rect -> Bool
+contains (x1, y1) rect2 =
   range_overlaps (x_range rect2) (x1, x1) &&
   range_overlaps (y_range rect2) (y1, y1)
 
