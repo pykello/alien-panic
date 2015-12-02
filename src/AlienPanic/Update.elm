@@ -10,10 +10,13 @@ type alias Arrows = { x:Int, y:Int }
 
 update: (Float, Arrows, Bool) -> GameModel -> GameModel
 update (delta, arrows, space) model =
-  model
-    |> update_hits (delta, space)
-    |> update_player (delta, arrows)
-    |> update_enemies delta
+  if model.won || model.lost then
+    model
+  else
+    model
+      |> update_hits (delta, space)
+      |> update_player (delta, arrows)
+      |> update_enemies delta
 
 update_hits (delta, space) model =
   let

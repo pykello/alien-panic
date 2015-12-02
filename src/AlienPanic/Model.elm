@@ -26,7 +26,9 @@ type alias GameModel = {
   bricks: List GameObject,
   ladders: List GameObject,
   pistons: List Rect,
-  hit_countdown: Float
+  hit_countdown: Float,
+  won: Bool,
+  lost: Bool
 }
 
 from_tiles: Int -> List String -> Maybe GameModel
@@ -50,7 +52,9 @@ from_tiles unit tiles =
                               {rect=from_pos p 1.0 1.0,
                                dir=NONE, name="ladder", verb=""}),
                  pistons = pistons,
-                 hit_countdown = 0
+                 hit_countdown = 0,
+                 won = False,
+                 lost = False
                }
       xs -> Nothing
 
