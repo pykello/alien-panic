@@ -139,9 +139,10 @@ on_ladder model rect =
 hole_depth: GameModel -> Rect -> Float
 hole_depth model rect =
   let
-    p = (center_x rect, bottom_y rect)
-    hole_below = head (filter (Rect.contains p) model.holes)
+    p = center rect
+    holes_below = filter (Rect.contains p) model.holes
   in
-    case hole_below of
-      Just (x, y, w, h) -> toFloat (ceiling y) - y
-      Nothing -> 0.0
+    case holes_below of
+      [] -> 0.0
+      (x, y, w, h) :: [] -> toFloat (ceiling y) - y
+      _ -> 0.6

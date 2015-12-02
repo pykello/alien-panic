@@ -9,7 +9,7 @@ import Graphics.Element exposing (..)
 import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
-debug = True
+debug = False
 
 view: GameModel -> Element
 view model =
@@ -17,13 +17,20 @@ view model =
     screen  = model.screen
     w = screen.width * screen.unit
     h = screen.height * screen.unit
+    (px, py, pw, ph) = model.player.rect
   in
     collage (floor w) (floor h)
      (concat [
         [rect w h |> filled bgcolor],
-        map (object_form screen) (model.bricks ++ model.ladders),
+        map (object_form screen) model.bricks,
         map (hole_form screen) model.holes,
-        if debug then [rect_form screen (rgb 0 0 255) model.player.rect] else [],
+        if debug then 
+          [
+            rect_form screen (rgb 0 0 255) (px, py, 0.05, 2),
+            rect_form screen (rgb 0 0 255) (px, py, 2, 0.05)
+          ] 
+        else [],
+        map (object_form screen) model.ladders,
         map (object_form screen) (model.player :: model.enemies)
       ])
 
@@ -63,7 +70,7 @@ physical_coord: Screen -> Rect -> (Float, Float)
 physical_coord screen (x, y, w, h) =
   let
     unit = screen.unit
-    dx = unit * (screen.width - w) * -0.5
-    dy = unit * (screen.height - h) * -0.5
+    dx = unit * (screen.width * -0.5 + 0.5)
+    dy = unit * (screen.height * -0.5 + 0.5)
   in
     (x * unit + dx, y * unit + dy)
