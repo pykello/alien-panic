@@ -25,7 +25,7 @@ type alias GameModel = {
   enemies: List GameObject,
   bricks: List GameObject,
   ladders: List GameObject,
-  holes: List Rect,
+  pistons: List Rect,
   hit_countdown: Float
 }
 
@@ -34,7 +34,7 @@ from_tiles unit tiles =
   let
     bricks = search_grid '#' tiles |> map (\p ->
                 {rect=from_pos p 1.0 1.0, dir=NONE, name="brick", verb=""})
-    holes = List.concat (map (platform_holes << .rect) bricks)
+    pistons = List.concat (map (platform_pistons << .rect) bricks)
   in
     case search_grid 'P' tiles of
       [] -> Nothing
@@ -49,13 +49,13 @@ from_tiles unit tiles =
                  ladders = search_grid '|' tiles |> map (\p ->
                               {rect=from_pos p 1.0 1.0,
                                dir=NONE, name="ladder", verb=""}),
-                 holes = holes,
+                 pistons = pistons,
                  hit_countdown = 0
                }
       xs -> Nothing
 
-platform_holes: Rect -> List Rect
-platform_holes (x, y, w, h) =
+platform_pistons: Rect -> List Rect
+platform_pistons (x, y, w, h) =
   [
     (x - w/4.0, y + h, w * 0.5, h),
     (x + w/4.0, y + h, w * 0.5, h)

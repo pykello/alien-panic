@@ -23,7 +23,7 @@ view model =
      (concat [
         [rect w h |> filled bgcolor],
         map (object_form screen) model.bricks,
-        map (hole_form screen) model.holes,
+        map (piston_form screen) model.pistons,
         if debug then 
           [
             rect_form screen (rgb 0 0 255) (px, py, 0.05, 2),
@@ -47,8 +47,8 @@ object_form screen obj =
       |> toForm 
       |> move (physical_coord screen obj.rect)
 
-hole_form: Screen -> Rect -> Form
-hole_form screen rect =
+piston_form: Screen -> Rect -> Form
+piston_form screen rect =
   let
     (x, _, _, _) = rect
     color = if not debug then

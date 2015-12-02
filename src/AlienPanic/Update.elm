@@ -24,14 +24,14 @@ update_hits (delta, space) model =
                         300.0
                       else
                         0.0
-    holes = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
-              dig_hole model.holes model.player
-            else
-              model.holes
+    pistons = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
+                dig_hole model.pistons model.player
+              else
+                model.pistons
   in
-    {model| hit_countdown=n_hit_countdown, holes=holes}
+    {model| hit_countdown=n_hit_countdown, pistons=pistons}
 
-dig_hole holes player =
+dig_hole pistons player =
   let
     r = player.rect
     test_point = if player.dir == LEFT then
@@ -39,14 +39,14 @@ dig_hole holes player =
                  else
                    (right_x r + 2 * eps, bottom_y r)
   in
-    holes |>
-      map (\hole -> if contains test_point hole then
-                     deepen_hole hole
-                    else
-                     hole)
+    pistons |>
+      map (\piston -> if contains test_point piston then
+                        press_piston piston
+                      else
+                        piston)
 
-deepen_hole (x, y, w, h) =
-  if hole_depth (x, y, w, h) < 0.5 - eps then
+press_piston (x, y, w, h) =
+  if piston_depth (x, y, w, h) < 0.5 - eps then
     (x, y - 0.2, w, h)
   else
     (x, y, w, h)
@@ -103,12 +103,12 @@ walk dx model obj =
   let
     (px, py, w, h) = obj.rect
     (nx, ny) =
-      case find_hole model (px + dx, py, w, h) of
-        Just hole ->
-          if hole_depth hole > 0.5 then
-            center hole
+      case find_piston model (px + dx, py, w, h) of
+        Just piston ->
+          if piston_depth piston > 0.5 then
+            center piston
           else
-            (px + dx, center_y hole)
+            (px + dx, center_y piston)
         Nothing ->
           (px + dx, toFloat (round py))
     walking = (on_platform model (nx, ny, w, h)) &&
@@ -139,7 +139,7 @@ on_platform model (x, y, w, h) =
   if on_ladder model (x, y, w, h) then
     on_platform model (x-1.1, y, w, h) || on_platform model (x+1.1, y, w, h)
   else
-    case find_hole model (x, y, w, h) of
+    case find_piston model (x, y, w, h) of
       Just _ -> True
       Nothing -> False
 
@@ -151,17 +151,17 @@ on_ladder model rect =
   in
     not (List.isEmpty overlapping_ladders)
 
-find_hole: GameModel -> Rect -> Maybe Rect
-find_hole model rect =
+find_piston: GameModel -> Rect -> Maybe Rect
+find_piston model rect =
   let
     p = (center_x rect, bottom_y rect)
-    holes_below = filter (Rect.contains p) model.holes
+    overlapping_pistons = filter (Rect.contains p) model.pistons
   in
-    case holes_below of
+    case overlapping_pistons of
       [] -> Nothing
       rect :: [] -> Just rect
       _ -> Nothing
 
-hole_depth: Rect -> Float
-hole_depth (x, y, w, h) =
+piston_depth: Rect -> Float
+piston_depth (x, y, w, h) =
   toFloat (ceiling y) - y
