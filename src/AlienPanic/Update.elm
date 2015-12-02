@@ -25,27 +25,25 @@ update_hits (delta, space) model =
                       else
                         0.0
     holes = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
-              dig_hole model.holes (hole_coord model.player)
+              dig_hole model.holes model.player
             else
               model.holes
   in
     {model| hit_countdown=n_hit_countdown, holes=holes}
 
-hole_coord player =
+dig_hole holes player =
   let
-    (player_x, player_y) = player.pos
-    dx = if player.dir == RIGHT then 1.0 else -0.0
-    hole_x = toFloat (floor ((player_x + dx) * 2.0)) * 0.5
-    hole_y = player_y - 1.0
-  in
-    (hole_x, hole_y)
-
-dig_hole holes pos =
-  holes |>
-    map (\hole -> if (pos_eq hole.pos pos) then
-                   {hole|depth=min (hole.depth+0.2) 0.6}
+    r = player.rect
+    test_point = if player.dir == LEFT then
+                   (left_x r, bottom_y r)
                  else
-                   hole)
+                   (right_x r, bottom_y r)
+  in
+    holes |>
+      map (\hole -> if contains test_point hole.rect then
+                     {hole|depth=min (hole.depth+0.2) 0.6}
+                   else
+                     hole)
 
 pos_eq (x1, y1) (x2, y2) =
   abs (x1 - x2) < eps &&

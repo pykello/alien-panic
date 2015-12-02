@@ -13,8 +13,17 @@ center_x (x, _, _, _) =
 center_y (_, y, _, _) =
   y
 
+center rect =
+  (center_x rect, center_y rect)
+
 bottom_y (_, y, _, h) =
   y - h * 0.5
+
+left_x (x, _, w, _) =
+  x - w * 0.5
+
+right_x (x, _, w, _) =
+  x + w * 0.5
 
 is_under: Rect -> Rect -> Bool
 is_under rect1 rect2 =
