@@ -45,10 +45,6 @@ dig_hole holes player =
                    else
                      hole)
 
-pos_eq (x1, y1) (x2, y2) =
-  abs (x1 - x2) < eps &&
-  abs (y1 - y2) < eps
-
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =
   let
