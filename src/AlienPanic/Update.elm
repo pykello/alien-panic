@@ -20,7 +20,7 @@ update_hits (delta, space) model =
     p_hit_countdown = model.hit_countdown
     n_hit_countdown = if p_hit_countdown > 0.0 then
                         p_hit_countdown - delta
-                      else if space then
+                      else if space && model.player.dir `member` [LEFT, RIGHT] then
                         300.0
                       else
                         0.0
