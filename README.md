@@ -4,7 +4,7 @@ Alien Panic is a game similar to [Space Panic](https://en.wikipedia.org/wiki/Spa
 
 # Building
 
-Run the following command to generate a HTML file which implements tic-tac-toe:
+Run the following command to generate a HTML file which implements Alien Panic:
 
 ```
 elm make alien-panic.elm --output=alien-panic.html
