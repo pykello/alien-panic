@@ -19,6 +19,9 @@ center rect =
 bottom_y (_, y, _, h) =
   y - h * 0.5
 
+top_y (_, y, _, h) =
+  y + h * 0.5
+
 left_x (x, _, w, _) =
   x - w * 0.5
 
@@ -30,9 +33,9 @@ overlaps rect1 rect2 =
   range_overlaps (y_range rect1) (y_range rect2)
 
 contains: (Float, Float) -> Rect -> Bool
-contains (x1, y1) rect2 =
-  range_overlaps (x_range rect2) (x1, x1) &&
-  range_overlaps (y_range rect2) (y1, y1)
+contains (x, y) rect =
+  x > (left_x rect) - eps && x < (right_x rect) - eps &&
+  y > (bottom_y rect) - eps && y < (top_y rect) - eps 
 
 x_range (x, _, w, _) =
   (x - w * 0.5, x + w * 0.5)

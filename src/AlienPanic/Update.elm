@@ -38,9 +38,9 @@ dig_hole pistons player =
   let
     r = player.rect
     test_point = if player.dir == LEFT then
-                   (left_x r - 2 * eps, bottom_y r)
+                   (left_x r, bottom_y r)
                  else
-                   (right_x r + 2 * eps, bottom_y r)
+                   (right_x r, bottom_y r)
   in
     pistons |>
       map (\piston -> if contains test_point piston then
