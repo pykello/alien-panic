@@ -142,9 +142,7 @@ on_platform model (x, y, w, h) =
   if on_ladder model (x, y, w, h) then
     on_platform model (x-1, y, w, h) || on_platform model (x+1, y, w, h)
   else
-    case find_piston model (x, y, w, h) of
-      Just _ -> True
-      Nothing -> False
+    find_piston model (x, y, w, h) /= Nothing
 
 on_ladder: GameModel -> Rect -> Bool
 on_ladder model rect =
