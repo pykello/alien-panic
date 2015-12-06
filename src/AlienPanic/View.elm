@@ -38,14 +38,18 @@ object_form: Screen -> GameObject -> Form
 object_form screen obj =
   let
     unit = screen.unit
+    (x, y, w, h) = obj.rect
     filename = "images/" ++ obj.name ++
                (if obj.verb == "" then "" else "_" ++ obj.verb) ++
                (if obj.dir == NONE then "" else "_" ++ toString obj.dir) ++
                ".gif"
+    debug_rect = rect (w * screen.unit) (h * screen.unit) |>
+                 outlined defaultLine
   in
-    image (floor unit) (floor unit) filename
-      |> toForm 
-      |> move (physical_coord screen obj.rect)
+    group (
+      (if debug then [debug_rect] else []) ++
+      [image (floor unit) (floor unit) filename |> toForm]
+    ) |> move (physical_coord screen obj.rect)
 
 piston_form: Screen -> Rect -> Form
 piston_form screen rect =
