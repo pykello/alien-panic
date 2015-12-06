@@ -43,10 +43,10 @@ from_tiles unit tiles =
       [] -> Nothing
       p :: [] -> Just {
                  screen = screen_from_tiles unit tiles,
-                 player = {rect=from_pos p 1.0 1.0,
+                 player = {rect=from_pos p 0.5 1.0,
                            dir=RIGHT, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
-                              {rect=from_pos p 1.0 1.0,
+                              {rect=from_pos p 0.5 1.0,
                                dir=LEFT, name="enemy", verb=""}),
                  bricks = bricks,
                  ladders = search_grid '|' tiles |> map (\p ->

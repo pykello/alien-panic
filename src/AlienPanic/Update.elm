@@ -18,6 +18,17 @@ update (delta, arrows, space) model =
       |> apply_hits
       |> update_player (delta, arrows)
       |> update_enemies delta
+      |> check_death
+
+check_death model =
+  let
+    r = model.player.rect
+    test_point = (center_x r + 0.09, center_y r)
+    e = filter (Rect.contains test_point << .rect) model.enemies
+    dead = length e > 0
+    lost = model.lost || dead
+  in
+    {model| lost=lost}
 
 update_hit_countdown (delta, space) model =
   let
@@ -67,9 +78,9 @@ target_piston pistons player =
   let
     r = player.rect
     test_point = if player.dir == LEFT then
-                   (left_x r, bottom_y r)
+                   (center_x r - 0.5, bottom_y r)
                  else
-                   (right_x r, bottom_y r)
+                   (center_x r + 0.5, bottom_y r)
   in
     head (filter (contains test_point) pistons)
 
