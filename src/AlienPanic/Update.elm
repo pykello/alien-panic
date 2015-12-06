@@ -50,15 +50,17 @@ hit_piston: Rect -> GameModel -> GameModel
 hit_piston piston model =
   let
     depth = piston_depth piston
-    enemies =
+    n_enemies =
       if depth < 0.5 then
         model.enemies
       else
         filter (\e -> not (e.rect `on_piston` piston)) model.enemies
-    pistons =
-      map (\p -> if p `on_piston` piston then press_piston p else p) model.pistons
+    killed = (length n_enemies) < (length model.enemies)
+    update_hit_piston = if killed then restore_piston else press_piston
+    update_piston = \p -> if p `on_piston` piston then update_hit_piston p else p
+    n_pistons = map update_piston model.pistons
   in
-    {model| enemies=enemies, pistons=pistons}
+    {model| enemies=n_enemies, pistons=n_pistons}
 
 target_piston: List Rect -> GameObject -> Maybe Rect
 target_piston pistons player =
@@ -76,6 +78,9 @@ press_piston (x, y, w, h) =
     (x, y - 0.2, w, h)
   else
     (x, y, w, h)
+
+restore_piston (x, y, w, h) =
+  (x, toFloat (ceiling y), w, h)
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =
