@@ -14,11 +14,12 @@ update (delta, arrows, space) model =
     model
   else
     model
-      |> update_hits (delta, space)
+      |> update_hit_countdown (delta, space)
+      |> apply_hits
       |> update_player (delta, arrows)
       |> update_enemies delta
 
-update_hits (delta, space) model =
+update_hit_countdown (delta, space) model =
   let
     p_hit_countdown = model.hit_countdown
     n_hit_countdown = if p_hit_countdown > 0.0 then
@@ -27,14 +28,40 @@ update_hits (delta, space) model =
                         300.0
                       else
                         0.0
-    pistons = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
-                dig_hole model.pistons model.player
-              else
-                model.pistons
+    pending_hit = p_hit_countdown > 0.0 && n_hit_countdown <= 0.0
   in
-    {model| hit_countdown=n_hit_countdown, pistons=pistons}
+    {model| hit_countdown=n_hit_countdown, pending_hit=pending_hit}
 
-dig_hole pistons player =
+apply_hits model =
+  let
+    n_model =
+      if model.pending_hit then
+        case target_piston model.pistons model.player of
+          Just piston ->
+            hit_piston piston model
+          Nothing ->
+            model
+      else
+        model
+  in
+    {n_model| pending_hit=False}
+
+hit_piston: Rect -> GameModel -> GameModel
+hit_piston piston model =
+  let
+    depth = piston_depth piston
+    enemies =
+      if depth < 0.5 then
+        model.enemies
+      else
+        filter (\e -> not (e.rect `on_piston` piston)) model.enemies
+    pistons =
+      map (\p -> if p `on_piston` piston then press_piston p else p) model.pistons
+  in
+    {model| enemies=enemies, pistons=pistons}
+
+target_piston: List Rect -> GameObject -> Maybe Rect
+target_piston pistons player =
   let
     r = player.rect
     test_point = if player.dir == LEFT then
@@ -42,11 +69,7 @@ dig_hole pistons player =
                  else
                    (right_x r, bottom_y r)
   in
-    pistons |>
-      map (\piston -> if contains test_point piston then
-                        press_piston piston
-                      else
-                        piston)
+    head (filter (contains test_point) pistons)
 
 press_piston (x, y, w, h) =
   if piston_depth (x, y, w, h) < 0.5 - eps then
@@ -155,13 +178,16 @@ on_ladder model rect =
 find_piston: GameModel -> Rect -> Maybe Rect
 find_piston model rect =
   let
-    p = (center_x rect, bottom_y rect)
-    overlapping_pistons = filter (Rect.contains p) model.pistons
+    overlapping_pistons = filter (on_piston rect) model.pistons
   in
     case overlapping_pistons of
       [] -> Nothing
       rect :: [] -> Just rect
       _ -> Nothing
+
+on_piston: Rect -> Rect -> Bool
+on_piston obj_rect piston =
+  Rect.contains (center_x obj_rect, bottom_y obj_rect) piston
 
 piston_depth: Rect -> Float
 piston_depth (x, y, w, h) =
