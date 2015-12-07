@@ -6,17 +6,48 @@ import AlienPanic.Rect exposing (..)
 import Color exposing (..)
 import Graphics.Collage as Collage exposing (..)
 import Graphics.Element exposing (..)
+import Text exposing (..)
 import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
+message_style = {defaultStyle|
+                  color=white,
+                  height=Just 20,
+                  typeface=["arial","sans-serif"]}
 debug = False
 
 view: GameModel -> Element
 view model =
-  flow down [
-    view_board model,
-    view_timer model
+  layers [
+    flow down [
+      view_board model,
+      view_timer model
+    ],
+    view_messages model
   ]
+
+view_messages: GameModel -> Element
+view_messages model =
+  let
+    screen = model.screen
+    sw = screen.width * screen.unit
+    sh = screen.width * screen.unit
+    w = sw * 0.5
+    h = 100.0
+    message = if model.lost then "You Lost!"
+              else if model.won then "You won!"
+              else ""
+  in
+    collage (floor sw) (floor sh)
+    (
+      if message == "" then
+        []
+      else
+        [
+          rect w h |> filled (rgb 100 100 100),
+          text (fromString message |> Text.style message_style)
+        ]
+    )
 
 view_timer: GameModel -> Element
 view_timer model =
@@ -44,7 +75,7 @@ view_board model =
     (px, py, pw, ph) = model.player.rect
   in
     collage (floor w) (floor h)
-     (concat [
+     (List.concat [
         [rect w h |> filled bgcolor],
         map (object_form screen) model.bricks,
         map (piston_form screen) model.pistons,
