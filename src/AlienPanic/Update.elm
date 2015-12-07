@@ -19,15 +19,6 @@ update (delta, arrows, space) model =
       |> update_enemies delta
       |> check_death
 
-check_death model =
-  let
-    r = model.player.rect
-    test_points = [(left_x r, center_y r), (right_x r, center_y r)]
-    dead = any (contains_any test_points << .rect) model.enemies
-    lost = model.lost || dead
-  in
-    {model| lost=lost}
-
 update_hit_countdown (delta, space) model =
   let
     p_hit_countdown = model.hit_countdown
@@ -52,6 +43,17 @@ hit_target_piston model =
     Nothing ->
       model
 
+target_piston: List Rect -> GameObject -> Maybe Rect
+target_piston pistons player =
+  let
+    r = player.rect
+    test_point = if player.dir == LEFT then
+                   (center_x r - 0.5, bottom_y r)
+                 else
+                   (center_x r + 0.5, bottom_y r)
+  in
+    head (filter (contains test_point) pistons)
+
 hit_piston: Rect -> GameModel -> GameModel
 hit_piston piston model =
   let
@@ -68,25 +70,14 @@ hit_piston piston model =
   in
     {model| enemies=n_enemies, pistons=n_pistons}
 
-target_piston: List Rect -> GameObject -> Maybe Rect
-target_piston pistons player =
-  let
-    r = player.rect
-    test_point = if player.dir == LEFT then
-                   (center_x r - 0.5, bottom_y r)
-                 else
-                   (center_x r + 0.5, bottom_y r)
-  in
-    head (filter (contains test_point) pistons)
+restore_piston piston =
+  Rect.move_y (piston_depth piston) piston
 
 press_piston piston =
   if piston_depth piston < 0.5 - eps then
     Rect.move_y -0.2 piston
   else
     piston
-
-restore_piston piston =
-  Rect.move_y (piston_depth piston) piston
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =
@@ -170,6 +161,15 @@ climb dy model obj =
             dir=if dy > 0 then UP else DOWN}
     else
       obj
+
+check_death model =
+  let
+    r = model.player.rect
+    test_points = [(left_x r, center_y r), (right_x r, center_y r)]
+    dead = any (contains_any test_points << .rect) model.enemies
+    lost = model.lost || dead
+  in
+    {model| lost=lost}
 
 on_platform: GameModel -> Rect -> Bool
 on_platform model (x, y, w, h) =
