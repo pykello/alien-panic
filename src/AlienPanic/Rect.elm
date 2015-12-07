@@ -1,7 +1,5 @@
 module AlienPanic.Rect where
 
-import List exposing (any)
-
 type alias Rect = (Float, Float, Float, Float)
 eps = 1e-6
 
@@ -41,7 +39,7 @@ contains (x, y) rect =
 
 contains_any: List (Float, Float) -> Rect -> Bool
 contains_any points rect =
-  any (\p -> contains p rect) points
+  List.any (\p -> contains p rect) points
 
 x_range (x, _, w, _) =
   (x - w * 0.5, x + w * 0.5)
