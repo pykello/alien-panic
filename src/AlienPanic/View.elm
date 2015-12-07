@@ -13,6 +13,30 @@ debug = False
 
 view: GameModel -> Element
 view model =
+  flow down [
+    view_board model,
+    view_timer model
+  ]
+
+view_timer: GameModel -> Element
+view_timer model =
+  let
+    screen = model.screen
+    w = screen.width * screen.unit
+    h = screen.unit
+    time_ratio = model.time_cur / model.time_max
+  in
+    collage (floor w) (floor h)
+    [
+      rect w h |>
+        filled (rgb 100 100 100),
+      rect (w * time_ratio) h |>
+        filled (rgb 100 0 0) |>
+        Collage.moveX (w * time_ratio / 2.0 - w / 2.0)
+    ]
+
+view_board: GameModel -> Element
+view_board model =
   let
     screen  = model.screen
     w = screen.width * screen.unit

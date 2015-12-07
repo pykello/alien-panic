@@ -9,7 +9,7 @@ import Signal exposing (constant, map3, foldp, sampleOn)
 import Keyboard exposing (arrows)
 
 main =
-  case Model.from_tiles 64 level0 of
+  case Model.from_tiles 60.0 64 level0 of
     Nothing -> constant (show "Model couldn't be loaded!")
     Just model -> Signal.map view (Signal.foldp update model input)
 

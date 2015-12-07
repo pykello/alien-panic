@@ -14,10 +14,14 @@ update (delta, arrows, space) model =
     model
   else
     model
+      |> update_timer delta
       |> update_hit_countdown (delta, space)
       |> update_player (delta, arrows)
       |> update_enemies delta
       |> check_death
+
+update_timer delta model =
+  {model| time_cur = model.time_cur + delta}
 
 update_hit_countdown (delta, space) model =
   let
