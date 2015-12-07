@@ -81,12 +81,12 @@ target_piston pistons player =
 
 press_piston piston =
   if piston_depth piston < 0.5 - eps then
-    Rect.move (0, -0.2) piston
+    Rect.move_y -0.2 piston
   else
     piston
 
 restore_piston piston =
-  Rect.move (0, piston_depth piston) piston
+  Rect.move_y (piston_depth piston) piston
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =
@@ -180,11 +180,7 @@ on_platform model (x, y, w, h) =
 
 on_ladder: GameModel -> Rect -> Bool
 on_ladder model rect =
-  let
-    c = center rect
-    overlapping_ladders = filter (Rect.contains c << .rect) model.ladders 
-  in
-    not (List.isEmpty overlapping_ladders)
+  any (Rect.contains (center rect) << .rect) model.ladders
 
 find_piston: GameModel -> Rect -> Maybe Rect
 find_piston model rect =
