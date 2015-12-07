@@ -1,5 +1,7 @@
 module AlienPanic.Rect where
 
+import List exposing (any)
+
 type alias Rect = (Float, Float, Float, Float)
 eps = 1e-6
 
@@ -35,7 +37,11 @@ overlaps rect1 rect2 =
 contains: (Float, Float) -> Rect -> Bool
 contains (x, y) rect =
   x > (left_x rect) - eps && x < (right_x rect) - eps &&
-  y > (bottom_y rect) - eps && y < (top_y rect) - eps 
+  y > (bottom_y rect) - eps && y < (top_y rect) - eps
+
+contains_any: List (Float, Float) -> Rect -> Bool
+contains_any points rect =
+  any (\p -> contains p rect) points
 
 x_range (x, _, w, _) =
   (x - w * 0.5, x + w * 0.5)

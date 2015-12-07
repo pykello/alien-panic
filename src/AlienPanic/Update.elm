@@ -23,11 +23,8 @@ update (delta, arrows, space) model =
 check_death model =
   let
     r = model.player.rect
-    l_point = (left_x r, center_y r)
-    r_point = (right_x r, center_y r)
-    e_left = filter (Rect.contains l_point << .rect) model.enemies
-    e_right = filter (Rect.contains r_point << .rect) model.enemies
-    dead = length (e_left ++ e_right) > 0
+    test_points = [(left_x r, center_y r), (right_x r, center_y r)]
+    dead = any (contains_any test_points << .rect) model.enemies
     lost = model.lost || dead
   in
     {model| lost=lost}
