@@ -170,8 +170,9 @@ check_death model =
   let
     r = model.player.rect
     test_points = [(left_x r, center_y r), (right_x r, center_y r)]
-    dead = any (contains_any test_points << .rect) model.enemies
-    lost = model.lost || dead
+    hit_by_enemy = any (contains_any test_points << .rect) model.enemies
+    time_up = model.time_cur >= model.time_max
+    lost = model.lost || hit_by_enemy || time_up
   in
     {model| lost=lost}
 

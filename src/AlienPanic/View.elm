@@ -23,7 +23,7 @@ view_timer model =
   let
     screen = model.screen
     w = screen.width * screen.unit
-    h = screen.unit
+    h = screen.unit * 0.5
     time_ratio = model.time_cur / model.time_max
   in
     collage (floor w) (floor h)
