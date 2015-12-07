@@ -4,7 +4,7 @@ import AlienPanic.Model exposing (..)
 import AlienPanic.Rect exposing (..)
 
 import Color exposing (..)
-import Graphics.Collage exposing (..)
+import Graphics.Collage as Collage exposing (..)
 import Graphics.Element exposing (..)
 import List exposing (concat, map)
 
@@ -49,7 +49,7 @@ object_form screen obj =
     group (
       (if debug then [debug_rect] else []) ++
       [image (floor unit) (floor unit) filename |> toForm]
-    ) |> move (physical_coord screen obj.rect)
+    ) |> Collage.move (physical_coord screen obj.rect)
 
 piston_form: Screen -> Rect -> Form
 piston_form screen rect =
@@ -68,7 +68,7 @@ rect_form: Screen -> Color -> Rect -> Form
 rect_form screen color (x, y, w, h) =
   rect (w * screen.unit) (h * screen.unit) |>
   filled color |>
-  move (physical_coord screen (x, y, w, h))
+  Collage.move (physical_coord screen (x, y, w, h))
 
 physical_coord: Screen -> Rect -> (Float, Float)
 physical_coord screen (x, y, w, h) =

@@ -79,14 +79,14 @@ target_piston pistons player =
   in
     head (filter (contains test_point) pistons)
 
-press_piston (x, y, w, h) =
-  if piston_depth (x, y, w, h) < 0.5 - eps then
-    (x, y - 0.2, w, h)
+press_piston piston =
+  if piston_depth piston < 0.5 - eps then
+    Rect.move (0, -0.2) piston
   else
-    (x, y, w, h)
+    piston
 
-restore_piston (x, y, w, h) =
-  (x, toFloat (ceiling y), w, h)
+restore_piston piston =
+  Rect.move (0, piston_depth piston) piston
 
 update_player: (Float, Arrows) -> GameModel -> GameModel
 update_player (delta, arrows) model =

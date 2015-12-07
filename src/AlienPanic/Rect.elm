@@ -49,3 +49,6 @@ y_range (_, y, _, h) =
 
 range_overlaps (a, b) (c, d) =
   (max a c) < (min b d) + eps
+
+move (dx, dy) (x, y, w, h) =
+  (x+dx, y+dy, w, h)
