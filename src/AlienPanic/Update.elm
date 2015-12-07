@@ -19,6 +19,7 @@ update (delta, arrows, space) model =
       |> update_player (delta, arrows)
       |> update_enemies delta
       |> check_death
+      |> check_victory
 
 update_timer delta model =
   {model| time_cur = model.time_cur + delta}
@@ -175,6 +176,9 @@ check_death model =
     lost = model.lost || hit_by_enemy || time_up
   in
     {model| lost=lost}
+
+check_victory model =
+  {model| won = model.won || isEmpty model.enemies}
 
 on_platform: GameModel -> Rect -> Bool
 on_platform model (x, y, w, h) =
