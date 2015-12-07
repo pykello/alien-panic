@@ -15,7 +15,6 @@ update (delta, arrows, space) model =
   else
     model
       |> update_hit_countdown (delta, space)
-      |> apply_hits
       |> update_player (delta, arrows)
       |> update_enemies delta
       |> check_death
@@ -38,23 +37,20 @@ update_hit_countdown (delta, space) model =
                         300.0
                       else
                         0.0
-    pending_hit = p_hit_countdown > 0.0 && n_hit_countdown <= 0.0
+    n_model = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
+                hit_target_piston model
+              else
+                model
   in
-    {model| hit_countdown=n_hit_countdown, pending_hit=pending_hit}
+    {n_model| hit_countdown=n_hit_countdown}
 
-apply_hits model =
-  let
-    n_model =
-      if model.pending_hit then
-        case target_piston model.pistons model.player of
-          Just piston ->
-            hit_piston piston model
-          Nothing ->
-            model
-      else
-        model
-  in
-    {n_model| pending_hit=False}
+hit_target_piston: GameModel -> GameModel
+hit_target_piston model =
+  case target_piston model.pistons model.player of
+    Just piston ->
+      hit_piston piston model
+    Nothing ->
+      model
 
 hit_piston: Rect -> GameModel -> GameModel
 hit_piston piston model =

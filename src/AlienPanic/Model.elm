@@ -27,7 +27,6 @@ type alias GameModel = {
   ladders: List GameObject,
   pistons: List Rect,
   hit_countdown: Float,
-  pending_hit: Bool,
   won: Bool,
   lost: Bool
 }
@@ -54,7 +53,6 @@ from_tiles unit tiles =
                                dir=NONE, name="ladder", verb=""}),
                  pistons = pistons,
                  hit_countdown = 0,
-                 pending_hit = False,
                  won = False,
                  lost = False
                }
