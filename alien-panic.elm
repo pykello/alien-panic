@@ -1,17 +1,13 @@
-import AlienPanic.Model as Model exposing (from_tiles)
-import AlienPanic.View exposing (view)
-import AlienPanic.Update exposing (update)
-import AlienPanic.Levels exposing (..)
+import UI.Model exposing (..)
+import UI.Update exposing (..)
+import UI.View exposing (..)
 
-import Graphics.Element exposing (..)
 import Time exposing (fps)
 import Signal exposing (constant, map3, foldp, sampleOn)
 import Keyboard exposing (arrows)
 
 main =
-  case Model.from_tiles 40.0 64 level0 of
-    Nothing -> constant (show "Model couldn't be loaded!")
-    Just model -> Signal.map view (Signal.foldp update model input)
+  Signal.map view (Signal.foldp update init input)
 
 input =
   let
