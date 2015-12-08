@@ -18,36 +18,10 @@ debug = False
 
 view: GameModel -> Element
 view model =
-  layers [
-    flow down [
-      view_board model,
-      view_timer model
-    ],
-    view_messages model
+  flow down [
+    view_board model,
+    view_timer model
   ]
-
-view_messages: GameModel -> Element
-view_messages model =
-  let
-    screen = model.screen
-    sw = screen.width * screen.unit
-    sh = screen.width * screen.unit
-    w = sw * 0.5
-    h = 100.0
-    message = if model.lost then "You Lost!"
-              else if model.won then "You won!"
-              else ""
-  in
-    collage (floor sw) (floor sh)
-    (
-      if message == "" then
-        []
-      else
-        [
-          rect w h |> filled (rgb 100 100 100),
-          text (fromString message |> Text.style message_style)
-        ]
-    )
 
 view_timer: GameModel -> Element
 view_timer model =
