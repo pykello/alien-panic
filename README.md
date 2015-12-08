@@ -4,7 +4,9 @@ Alien Panic is a game similar to [Space Panic](https://en.wikipedia.org/wiki/Spa
 
 # Building
 
-Run the following command to generate a HTML file which implements Alien Panic:
+First, install Elm using the instructions found [here](http://elm-lang.org/install).
+
+Then, run the following command to generate a HTML file which implements Alien Panic:
 
 ```
 elm make alien-panic.elm --output=alien-panic.html
