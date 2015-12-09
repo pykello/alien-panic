@@ -10,10 +10,6 @@ import Text exposing (..)
 import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
-message_style = {defaultStyle|
-                  color=white,
-                  height=Just 20,
-                  typeface=["arial","sans-serif"]}
 debug = False
 
 view: GameModel -> Element
