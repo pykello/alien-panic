@@ -11,9 +11,9 @@ import Text exposing (..)
 import List exposing (concat, map)
 
 message_style = {defaultStyle|
-                  color=white,
+                  color=black,
                   height=Just 20,
-                  typeface=["arial","sans-serif"]}
+                  typeface=["monospace","sans-serif"]}
 
 view: UIModel -> Element
 view ui_model =
@@ -29,10 +29,10 @@ view ui_model =
 view_messages: GameModel -> Element
 view_messages model =
   let
-    screen = model.screen
+    screen  = model.screen
     sw = screen.width * screen.unit
-    sh = screen.width * screen.unit
-    w = sw * 0.5
+    sh = screen.height * screen.unit
+    w = 300.0
     h = 100.0
     message = if model.lost then "You Lost!"
               else if model.won then "You won!"
@@ -44,7 +44,9 @@ view_messages model =
         []
       else
         [
-          rect w h |> filled (rgb 100 100 100),
+          rect w h |> filled white,
+          rect (w-20) (h-20) |> filled black,
+          rect (w-40) (h-40) |> filled white,
           text (fromString message |> Text.style message_style)
         ]
     )
