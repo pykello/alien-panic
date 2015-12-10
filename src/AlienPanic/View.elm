@@ -27,11 +27,8 @@ view_timer model =
     timer_h = unit // 2
     passed_w = (timer_w * model.time_cur) // model.time_max
   in
-    layers
-    [
-      rect_elem timer_w timer_h (rgb 100 100 100),
-      rect_elem passed_w timer_h (rgb 100 0 0)
-    ]
+    layers [rect_elem timer_w timer_h (rgb 100 100 100),
+            rect_elem passed_w timer_h (rgb 100 0 0)]
 
 rect_elem rect_w rect_h color =
   collage rect_w rect_h [
@@ -46,12 +43,12 @@ view_board model =
   collage screen_w screen_h
    [List.concat [
       [rect_i screen_w screen_h |> filled bgcolor |>
-        move (screen_w*0.5, screen_h*0.5)],
+        move (screen_w * 0.5, screen_h * 0.5)],
       map object_form model.bricks,
       map piston_form model.pistons,
       map object_form model.ladders,
       map object_form (model.player :: model.enemies)
-    ] |> group |> move (-screen_w*0.5,-screen_h*0.5)]
+    ] |> group |> move (-screen_w * 0.5, -screen_h * 0.5)]
 
 object_form: GameObject -> Form
 object_form obj =
@@ -63,10 +60,10 @@ object_form obj =
                ".gif"
   in
     image unit unit filename |> toForm 
-      |> Collage.move ((x+0.5) * unit + w * 0.5, (y+0.5) * unit + h * 0.5)
+      |> move ((x + 0.5) * unit + w * 0.5, (y + 0.5) * unit + h * 0.5)
 
 piston_form: Rect -> Form
 piston_form (x, y, w, h) =
   rect (w * toFloat unit) (h * toFloat unit) |>
   filled bgcolor |>
-  Collage.move ((x+0.5) * unit + w * 0.5, (y+0.5) * unit + h * 0.5)
+  move ((x + 0.5) * unit + w * 0.5, (y + 0.5) * unit + h * 0.5)
