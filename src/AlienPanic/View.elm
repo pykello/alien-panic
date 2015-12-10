@@ -35,15 +35,12 @@ rect_elem rect_w rect_h color =
     rect (toFloat rect_w) (toFloat rect_h) |> filled color
   ]
 
-rect_i w h =
-  rect (toFloat w) (toFloat h)
-
 view_board: GameModel -> Element
 view_board model =
   collage screen_w screen_h
    [List.concat [
-      [rect_i screen_w screen_h |> filled bgcolor |>
-        move (screen_w * 0.5, screen_h * 0.5)],
+      [rect (toFloat screen_w) (toFloat screen_h) |>
+       filled bgcolor |> move (screen_w * 0.5, screen_h * 0.5)],
       map object_form model.bricks,
       map piston_form model.pistons,
       map object_form model.ladders,
