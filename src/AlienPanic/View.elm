@@ -55,22 +55,17 @@ view_board model =
 object_form: GameObject -> Form
 object_form obj =
   let
-    (x, y, w, h) = obj.rect
     filename = "images/" ++ obj.name ++
                (if obj.verb == "" then "" else "_" ++ obj.verb) ++
                (if obj.dir == NONE then "" else "_" ++ toString obj.dir) ++
                ".gif"
   in
-    group (
-      [image unit unit filename |> toForm]
-    ) |> Collage.move (physical_coord obj.rect)
+    image unit unit filename |> toForm 
+      |> Collage.move (physical_coord obj.rect)
 
 piston_form: Rect -> Form
 piston_form rect =
-  let
-    (x, _, _, _) = rect
-  in
-    rect_form bgcolor rect
+  rect_form bgcolor rect
 
 rect_form: Color -> Rect -> Form
 rect_form color (x, y, w, h) =
