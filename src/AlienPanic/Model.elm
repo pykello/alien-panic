@@ -1,8 +1,8 @@
 module AlienPanic.Model where
 
 import AlienPanic.Rect as Rect exposing (..)
-import String exposing (indexes)
-import List exposing (map)
+import String exposing (indexes, length)
+import List exposing (map, head, length)
 
 type Dir = LEFT | RIGHT | UP | DOWN | NONE
 
@@ -23,7 +23,8 @@ type alias GameModel = {
   time_cur: Int,
   hit_countdown: Float,
   won: Bool,
-  lost: Bool
+  lost: Bool,
+  size: (Int, Int)
 }
 
 from_tiles: Int -> List String -> Maybe GameModel
@@ -32,6 +33,9 @@ from_tiles duration tiles =
     bricks = search_grid '#' tiles |> map (\p ->
                 {rect=from_pos p 1.0 1.0, dir=NONE, name="brick", verb=""})
     pistons = List.concat (map (platform_pistons << .rect) bricks)
+    size = case head tiles of
+             Nothing -> (0, 0)
+             Just row -> (String.length row, List.length tiles)
   in
     case search_grid 'P' tiles of
       [] -> Nothing
@@ -50,7 +54,8 @@ from_tiles duration tiles =
                  time_cur = 0,
                  time_max = duration * 1000,
                  won = False,
-                 lost = False
+                 lost = False,
+                 size = size
                }
       xs -> Nothing
 
