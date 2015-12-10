@@ -11,6 +11,8 @@ import Text exposing (..)
 import List exposing (concat, map, foldl, length)
 import String exposing (length)
 
+screen_w = 9 * 64
+screen_h = 12 * 64
 message_style = {defaultStyle|
                   color=black,
                   height=Just 20,
@@ -24,30 +26,29 @@ view ui_model =
     Just m ->
       layers [
         AlienPanic.View.view m,
-        view_messages m
+        view_messages (get_messages m)
       ]
 
-view_messages: GameModel -> Element
-view_messages model =
+get_messages model =
+  if model.lost then ["You Lost!"]
+  else if model.won then ["You won!"]
+  else []
+
+view_messages: List String -> Element
+view_messages messages =
   let
-    screen  = model.screen
-    sw = screen.width * screen.unit
-    sh = screen.height * screen.unit
-    message = if model.lost then ["You Lost!"]
-              else if model.won then ["You won!"]
-              else []
-    maxlen = foldl (max << String.length) 0 message
+    maxlen = foldl (max << String.length) 0 messages
     w = 12.0 * toFloat maxlen + 150.0
-    h = 75 + 24 * (toFloat (List.length message))
+    h = 75 + 24 * (toFloat (List.length messages))
     msg_elems = map
       (\s ->
         fromString s |> Text.style message_style |> centered |>
         container (round w) 24 middle)
-      message
+      messages
   in
-    collage (floor sw) (floor sh)
+    collage screen_w screen_h
     (
-      if message == [] then
+      if messages == [] then
         []
       else
         [
