@@ -66,19 +66,7 @@ object_form obj =
       |> Collage.move ((x+0.5) * unit + w * 0.5, (y+0.5) * unit + h * 0.5)
 
 piston_form: Rect -> Form
-piston_form rect =
-  rect_form bgcolor rect
-
-rect_form: Color -> Rect -> Form
-rect_form color (x, y, w, h) =
+piston_form (x, y, w, h) =
   rect (w * toFloat unit) (h * toFloat unit) |>
-  filled color |>
+  filled bgcolor |>
   Collage.move ((x+0.5) * unit + w * 0.5, (y+0.5) * unit + h * 0.5)
-
-physical_coord: Rect -> (Float, Float)
-physical_coord (x, y, w, h) =
-  let
-    dx = unit * 0.5 - screen_w * 0.5
-    dy = unit * 0.5 - screen_h * 0.5
-  in
-    (x * unit + dx, y * unit + dy)
