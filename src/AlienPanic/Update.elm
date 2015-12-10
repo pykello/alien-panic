@@ -22,7 +22,7 @@ update (delta, arrows, space) model =
       |> check_victory
 
 update_timer delta model =
-  {model| time_cur = model.time_cur + delta}
+  {model| time_cur = model.time_cur + round delta}
 
 update_hit_countdown (delta, space) model =
   let

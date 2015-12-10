@@ -12,7 +12,7 @@ import List exposing (concat, map, foldl, length)
 import String exposing (length)
 
 screen_w = 9 * 64
-screen_h = 12 * 64
+screen_h = 11 * 64
 char_w = 12
 line_h = 27
 message_style = {defaultStyle|

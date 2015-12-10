@@ -26,14 +26,14 @@ type alias GameModel = {
   bricks: List GameObject,
   ladders: List GameObject,
   pistons: List Rect,
-  time_max: Float,
-  time_cur: Float,
+  time_max: Int,
+  time_cur: Int,
   hit_countdown: Float,
   won: Bool,
   lost: Bool
 }
 
-from_tiles: Float -> Int -> List String -> Maybe GameModel
+from_tiles: Int -> Int -> List String -> Maybe GameModel
 from_tiles duration unit tiles =
   let
     bricks = search_grid '#' tiles |> map (\p ->
@@ -55,8 +55,8 @@ from_tiles duration unit tiles =
                                dir=NONE, name="ladder", verb=""}),
                  pistons = pistons,
                  hit_countdown = 0,
-                 time_cur = 0.0,
-                 time_max = duration * 1000.0,
+                 time_cur = 0,
+                 time_max = duration * 1000,
                  won = False,
                  lost = False
                }

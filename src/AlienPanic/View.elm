@@ -10,7 +10,9 @@ import Text exposing (..)
 import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
-debug = False
+unit = 64
+screen_w = 9 * 64
+screen_h = 11 * 64
 
 view: GameModel -> Element
 view model =
@@ -19,87 +21,67 @@ view model =
     view_timer model
   ]
 
-view_timer: GameModel -> Element
 view_timer model =
   let
-    screen = model.screen
-    w = screen.width * screen.unit
-    h = screen.unit * 0.5
-    time_ratio = model.time_cur / model.time_max
+    timer_w = screen_w
+    timer_h = unit // 2
+    passed_w = (timer_w * model.time_cur) // model.time_max
   in
-    collage (floor w) (floor h)
+    layers
     [
-      rect w h |>
-        filled (rgb 100 100 100),
-      rect (w * time_ratio) h |>
-        filled (rgb 100 0 0) |>
-        Collage.moveX (w * time_ratio / 2.0 - w / 2.0)
+      rect_elem timer_w timer_h (rgb 100 100 100),
+      rect_elem passed_w timer_h (rgb 100 0 0)
     ]
+
+rect_elem rect_w rect_h color =
+  collage rect_w rect_h [
+    rect (toFloat rect_w) (toFloat rect_h) |> filled color
+  ]
+
+rect_i w h =
+  rect (toFloat w) (toFloat h)
 
 view_board: GameModel -> Element
 view_board model =
-  let
-    screen  = model.screen
-    w = screen.width * screen.unit
-    h = screen.height * screen.unit
-    (px, py, pw, ph) = model.player.rect
-  in
-    collage (floor w) (floor h)
-     (List.concat [
-        [rect w h |> filled bgcolor],
-        map (object_form screen) model.bricks,
-        map (piston_form screen) model.pistons,
-        if debug then 
-          [
-            rect_form screen (rgb 0 0 255) (px, py, 0.05, 2),
-            rect_form screen (rgb 0 0 255) (px, py, 2, 0.05)
-          ] 
-        else [],
-        map (object_form screen) model.ladders,
-        map (object_form screen) (model.player :: model.enemies)
-      ])
+  collage screen_w screen_h
+   (List.concat [
+      [rect_i screen_w screen_h |> filled bgcolor],
+      map object_form model.bricks,
+      map piston_form model.pistons,
+      map object_form model.ladders,
+      map object_form (model.player :: model.enemies)
+    ])
 
-object_form: Screen -> GameObject -> Form
-object_form screen obj =
+object_form: GameObject -> Form
+object_form obj =
   let
-    unit = screen.unit
     (x, y, w, h) = obj.rect
     filename = "images/" ++ obj.name ++
                (if obj.verb == "" then "" else "_" ++ obj.verb) ++
                (if obj.dir == NONE then "" else "_" ++ toString obj.dir) ++
                ".gif"
-    debug_rect = rect (w * screen.unit) (h * screen.unit) |>
-                 outlined defaultLine
   in
     group (
-      (if debug then [debug_rect] else []) ++
-      [image (floor unit) (floor unit) filename |> toForm]
-    ) |> Collage.move (physical_coord screen obj.rect)
+      [image unit unit filename |> toForm]
+    ) |> Collage.move (physical_coord obj.rect)
 
-piston_form: Screen -> Rect -> Form
-piston_form screen rect =
+piston_form: Rect -> Form
+piston_form rect =
   let
     (x, _, _, _) = rect
-    color = if not debug then
-              bgcolor
-            else if (x - toFloat (floor x)) > 0.5 then
-              (rgb 255 0 0)
-            else
-              (rgb 0 255 0)
   in
-    rect_form screen color rect
+    rect_form bgcolor rect
 
-rect_form: Screen -> Color -> Rect -> Form
-rect_form screen color (x, y, w, h) =
-  rect (w * screen.unit) (h * screen.unit) |>
+rect_form: Color -> Rect -> Form
+rect_form color (x, y, w, h) =
+  rect (w * toFloat unit) (h * toFloat unit) |>
   filled color |>
-  Collage.move (physical_coord screen (x, y, w, h))
+  Collage.move (physical_coord (x, y, w, h))
 
-physical_coord: Screen -> Rect -> (Float, Float)
-physical_coord screen (x, y, w, h) =
+physical_coord: Rect -> (Float, Float)
+physical_coord (x, y, w, h) =
   let
-    unit = screen.unit
-    dx = unit * (screen.width * -0.5 + 0.5)
-    dy = unit * (screen.height * -0.5 + 0.5)
+    dx = unit * 0.5 - screen_w * 0.5
+    dy = unit * 0.5 - screen_h * 0.5
   in
     (x * unit + dx, y * unit + dy)
