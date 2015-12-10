@@ -8,7 +8,8 @@ import Color exposing (..)
 import Graphics.Collage as Collage exposing (..)
 import Graphics.Element exposing (..)
 import Text exposing (..)
-import List exposing (concat, map)
+import List exposing (concat, map, foldl, length)
+import String exposing (length)
 
 message_style = {defaultStyle|
                   color=black,
@@ -32,21 +33,27 @@ view_messages model =
     screen  = model.screen
     sw = screen.width * screen.unit
     sh = screen.height * screen.unit
-    w = 300.0
-    h = 100.0
-    message = if model.lost then "You Lost!"
-              else if model.won then "You won!"
-              else ""
+    message = if model.lost then ["You Lost!"]
+              else if model.won then ["You won!"]
+              else []
+    maxlen = foldl (max << String.length) 0 message
+    w = 12.0 * toFloat maxlen + 150.0
+    h = 75 + 24 * (toFloat (List.length message))
+    msg_elems = map
+      (\s ->
+        fromString s |> Text.style message_style |> centered |>
+        container (round w) 24 middle)
+      message
   in
     collage (floor sw) (floor sh)
     (
-      if message == "" then
+      if message == [] then
         []
       else
         [
           rect w h |> filled white,
           rect (w-20) (h-20) |> filled black,
           rect (w-40) (h-40) |> filled white,
-          text (fromString message |> Text.style message_style)
+          toForm (flow down msg_elems)
         ]
     )
