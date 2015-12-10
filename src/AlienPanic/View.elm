@@ -6,7 +6,6 @@ import AlienPanic.Rect exposing (..)
 import Color exposing (..)
 import Graphics.Collage as Collage exposing (..)
 import Graphics.Element exposing (..)
-import Text exposing (..)
 import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
