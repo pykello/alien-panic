@@ -9,5 +9,5 @@ type alias UIModel = {
 
 init: UIModel
 init =
-  {game_model=from_tiles 40 64 level0}
+  {game_model=from_tiles 40 level0}
 

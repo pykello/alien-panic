@@ -13,14 +13,7 @@ type alias GameObject = {
   verb: String
 }
 
-type alias Screen = {
-  unit: Float,
-  width: Float,
-  height: Float
-}
-
 type alias GameModel = {
-  screen: Screen,
   player: GameObject,
   enemies: List GameObject,
   bricks: List GameObject,
@@ -33,8 +26,8 @@ type alias GameModel = {
   lost: Bool
 }
 
-from_tiles: Int -> Int -> List String -> Maybe GameModel
-from_tiles duration unit tiles =
+from_tiles: Int -> List String -> Maybe GameModel
+from_tiles duration tiles =
   let
     bricks = search_grid '#' tiles |> map (\p ->
                 {rect=from_pos p 1.0 1.0, dir=NONE, name="brick", verb=""})
@@ -43,7 +36,6 @@ from_tiles duration unit tiles =
     case search_grid 'P' tiles of
       [] -> Nothing
       p :: [] -> Just {
-                 screen = screen_from_tiles unit tiles,
                  player = {rect=from_pos p 0.35 1.0,
                            dir=RIGHT, name="player", verb=""},
                  enemies = search_grid 'E' tiles |> map (\p ->
@@ -68,16 +60,6 @@ platform_pistons (x, y, w, h) =
     (x - w/4.0, y + h, w * 0.5, h),
     (x + w/4.0, y + h, w * 0.5, h)
   ]
-
-screen_from_tiles: Int -> List String -> Screen
-screen_from_tiles unit tiles =
-  case tiles of
-    [] -> {unit = 0.0, width = 0.0, height = 0.0}
-    x :: xs -> {
-                 unit = toFloat unit,
-                 width = toFloat (String.length(x)),
-                 height = toFloat (List.length(tiles))
-               }
 
 search_grid: Char -> List String -> List (Float, Float)
 search_grid ch board =
