@@ -44,24 +44,26 @@ rect_i w h =
 view_board: GameModel -> Element
 view_board model =
   collage screen_w screen_h
-   (List.concat [
-      [rect_i screen_w screen_h |> filled bgcolor],
+   [List.concat [
+      [rect_i screen_w screen_h |> filled bgcolor |>
+        move (screen_w*0.5, screen_h*0.5)],
       map object_form model.bricks,
       map piston_form model.pistons,
       map object_form model.ladders,
       map object_form (model.player :: model.enemies)
-    ])
+    ] |> group |> move (-screen_w*0.5,-screen_h*0.5)]
 
 object_form: GameObject -> Form
 object_form obj =
   let
+    (x, y, w, h) = obj.rect
     filename = "images/" ++ obj.name ++
                (if obj.verb == "" then "" else "_" ++ obj.verb) ++
                (if obj.dir == NONE then "" else "_" ++ toString obj.dir) ++
                ".gif"
   in
     image unit unit filename |> toForm 
-      |> Collage.move (physical_coord obj.rect)
+      |> Collage.move ((x+0.5) * unit + w * 0.5, (y+0.5) * unit + h * 0.5)
 
 piston_form: Rect -> Form
 piston_form rect =
@@ -71,7 +73,7 @@ rect_form: Color -> Rect -> Form
 rect_form color (x, y, w, h) =
   rect (w * toFloat unit) (h * toFloat unit) |>
   filled color |>
-  Collage.move (physical_coord (x, y, w, h))
+  Collage.move ((x+0.5) * unit + w * 0.5, (y+0.5) * unit + h * 0.5)
 
 physical_coord: Rect -> (Float, Float)
 physical_coord (x, y, w, h) =
