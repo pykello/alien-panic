@@ -43,7 +43,7 @@ view_messages messages =
     linecount = List.length messages
     msgbox_w = char_w * maxlen + 150
     msgbox_h = line_h * linecount + 75
-    msg_elems = map (contained_text msgbox_w msgbox_h) messages
+    msg_elems = map (contained_text msgbox_w line_h) messages
   in
     collage screen_w screen_h
     (
