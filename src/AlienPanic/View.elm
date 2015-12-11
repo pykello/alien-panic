@@ -59,10 +59,10 @@ object_form obj =
                ".gif"
   in
     image unit unit filename |> toForm 
-      |> move ((x + 0.5) * unit + w * 0.5, (y + 0.5) * unit + h * 0.5)
+      |> move ((x + 0.5) * unit, (y + 0.5) * unit)
 
 piston_form: Rect -> Form
 piston_form (x, y, w, h) =
   rect (w * toFloat unit) (h * toFloat unit) |>
   filled bgcolor |>
-  move ((x + 0.5) * unit + w * 0.5, (y + 0.5) * unit + h * 0.5)
+  move ((x + 0.5) * unit, (y + 0.5) * unit)
