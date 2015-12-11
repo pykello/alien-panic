@@ -10,8 +10,6 @@ import List exposing (concat, map)
 
 bgcolor = rgb 174 238 238
 unit = 64
-screen_w = 9 * 64
-screen_h = 11 * 64
 
 view: GameModel -> Element
 view model =
@@ -22,7 +20,8 @@ view model =
 
 view_timer model =
   let
-    timer_w = screen_w
+    (board_w, board_h) = model.size
+    timer_w = board_w * unit
     timer_h = unit // 2
     passed_w = (timer_w * model.time_cur) // model.time_max
   in
@@ -36,15 +35,19 @@ rect_elem rect_w rect_h color =
 
 view_board: GameModel -> Element
 view_board model =
-  collage screen_w screen_h
-   [List.concat [
-      [rect (toFloat screen_w) (toFloat screen_h) |>
-       filled bgcolor |> move (screen_w * 0.5, screen_h * 0.5)],
-      map object_form model.bricks,
-      map piston_form model.pistons,
-      map object_form model.ladders,
-      map object_form (model.player :: model.enemies)
-    ] |> group |> move (-screen_w * 0.5, -screen_h * 0.5)]
+  let
+    (virt_w, virt_h) = model.size
+    (real_w, real_h) = (toFloat (virt_w * unit), toFloat (virt_h * unit))
+  in
+    collage (round real_w) (round real_h)
+     [List.concat [
+        [rect real_w real_h |>
+         filled bgcolor |> move (real_w * 0.5, real_h * 0.5)],
+        map object_form model.bricks,
+        map piston_form model.pistons,
+        map object_form model.ladders,
+        map object_form (model.player :: model.enemies)
+      ] |> group |> move (-real_w * 0.5, -real_h * 0.5)]
 
 object_form: GameObject -> Form
 object_form obj =
