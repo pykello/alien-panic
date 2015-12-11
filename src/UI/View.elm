@@ -32,7 +32,7 @@ view ui_model =
       ]
 
 get_messages model =
-  if model.lost then ["You Lost!"]
+  if model.lost then ["You Lost!", "Press space to restart."]
   else if model.won then ["You won!"]
   else []
 
