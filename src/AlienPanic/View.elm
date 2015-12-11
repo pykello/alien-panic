@@ -20,8 +20,7 @@ view model =
 
 view_timer model =
   let
-    (board_w, board_h) = model.size
-    timer_w = board_w * unit
+    timer_w = fst model.size * unit
     timer_h = unit // 2
     passed_w = (timer_w * model.time_cur) // model.time_max
   in
@@ -36,18 +35,18 @@ rect_elem rect_w rect_h color =
 view_board: GameModel -> Element
 view_board model =
   let
-    (virt_w, virt_h) = model.size
-    (real_w, real_h) = (toFloat (virt_w * unit), toFloat (virt_h * unit))
+    board_w = toFloat (fst model.size * unit)
+    board_h = toFloat (snd model.size * unit)
   in
-    collage (round real_w) (round real_h)
+    collage (round board_w) (round board_h)
      [List.concat [
-        [rect real_w real_h |>
-         filled bgcolor |> move (real_w * 0.5, real_h * 0.5)],
+        [rect board_w board_h |>
+         filled bgcolor |> move (board_w * 0.5, board_h * 0.5)],
         map object_form model.bricks,
         map piston_form model.pistons,
         map object_form model.ladders,
         map object_form (model.player :: model.enemies)
-      ] |> group |> move (-real_w * 0.5, -real_h * 0.5)]
+      ] |> group |> move (-board_w * 0.5, -board_h * 0.5)]
 
 object_form: GameObject -> Form
 object_form obj =
