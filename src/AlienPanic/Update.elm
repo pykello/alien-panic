@@ -6,6 +6,10 @@ import Keyboard exposing (..)
 import List exposing (..)
 
 eps = 1e-6
+hit_timeout  = 300.0    -- milliseconds
+player_speed = 0.00075  -- units/millisecond
+enemy_speed  = 0.00045  -- units/millisecond
+
 type alias Arrows = { x:Int, y:Int }
 
 update: (Float, Arrows, Bool) -> GameModel -> GameModel
@@ -30,7 +34,7 @@ update_hit_countdown (delta, space) model =
     n_hit_countdown = if p_hit_countdown > 0.0 then
                         p_hit_countdown - delta
                       else if space && model.player.dir `member` [LEFT, RIGHT] then
-                        300.0
+                        hit_timeout
                       else
                         0.0
     n_model = if p_hit_countdown > 0.0 && n_hit_countdown <= 0.0 then
@@ -99,8 +103,8 @@ update_player (delta, arrows) model =
 move_player: (Float, Arrows) -> GameModel -> GameObject
 move_player (delta, arrows) model =
   let
-    dx = 0.00075 * delta * (toFloat arrows.x)
-    dy = 0.00075 * delta * (toFloat arrows.y)
+    dx = player_speed * delta * (toFloat arrows.x)
+    dy = player_speed * delta * (toFloat arrows.y)
   in
     model.player |> reset |> walk dx model |> climb dy model
 
@@ -116,7 +120,7 @@ update_enemies delta model =
 update_enemy: Float -> GameModel -> GameObject -> GameObject
 update_enemy delta model enemy =
   let
-    dx = 0.00045 * delta * (if enemy.dir == LEFT then -1.0 else 1.0)
+    dx = enemy_speed * delta * (if enemy.dir == LEFT then -1.0 else 1.0)
   in
     enemy |> reset |> walk dx model |> update_enemy_dir
 
